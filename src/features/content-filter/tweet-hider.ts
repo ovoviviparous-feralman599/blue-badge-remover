@@ -1,12 +1,21 @@
 // src/features/content-filter/tweet-hider.ts
+import { t, type Language, DEFAULT_LANGUAGE } from '@shared/i18n';
+
 const ORIGINAL_CONTENT_KEY = 'data-bbr-original';
 const COLLAPSED_ATTR = 'data-bbr-collapsed';
 const HIDDEN_QUOTE_ATTR = 'data-bbr-hidden-quote';
+
+let currentLanguage: Language = DEFAULT_LANGUAGE;
+
+export function setTweetHiderLanguage(lang: Language): void {
+  currentLanguage = lang;
+}
 
 export interface HideContext {
   reason: 'fadak' | 'retweet' | 'quote-entire';
   handle?: string;
   retweetedBy?: string;
+  quotedBy?: string;
 }
 
 export interface HideQuoteContext {
@@ -34,7 +43,7 @@ export function hideTweet(element: HTMLElement, mode: 'remove' | 'collapse', con
   const placeholder = document.createElement('div');
   placeholder.setAttribute(COLLAPSED_ATTR, 'true');
   placeholder.textContent = label;
-  placeholder.style.cssText = 'padding:12px;color:#71767b;cursor:pointer;text-align:center;font-size:13px;border:1px solid #38444d;border-radius:12px;margin:4px 0;';
+  placeholder.style.cssText = 'padding:12px;color:#71767b;cursor:pointer;text-align:center;font-size:13px;';
   placeholder.addEventListener('click', () => showTweet(element), { once: true });
   element.appendChild(placeholder);
 }
@@ -50,10 +59,10 @@ export function hideQuoteBlock(quoteElement: HTMLElement, context?: HideQuoteCon
     }
   });
 
-  const handle = context?.handle ?? '알 수 없음';
+  const handle = context?.handle ?? '';
   const placeholder = document.createElement('div');
   placeholder.setAttribute(COLLAPSED_ATTR, 'true');
-  placeholder.textContent = `파딱 계정(${handle})의 인용 트윗이 숨겨졌습니다 (클릭하여 펼치기)`;
+  placeholder.textContent = t('hiddenQuoteTweet', currentLanguage, { handle });
   placeholder.style.cssText = 'padding:8px 12px;color:#71767b;cursor:pointer;text-align:center;font-size:12px;';
   placeholder.addEventListener('click', () => showQuoteBlock(quoteElement), { once: true });
   quoteElement.appendChild(placeholder);
@@ -87,16 +96,22 @@ function showQuoteBlock(element: HTMLElement): void {
 }
 
 function buildHideLabel(context?: HideContext): string {
-  if (!context) return '숨겨진 트윗 (클릭하여 펼치기)';
+  if (!context) return t('hiddenTweetClick', currentLanguage);
 
   switch (context.reason) {
     case 'fadak':
-      return `파딱 계정(${context.handle ?? ''})의 트윗이 숨겨졌습니다 (클릭하여 펼치기)`;
+      return t('hiddenTweetFadak', currentLanguage, { handle: context.handle ?? '' });
     case 'retweet':
-      return `${context.retweetedBy ?? ''}님이 파딱 계정(${context.handle ?? ''})의 트윗을 리트윗했습니다 (클릭하여 펼치기)`;
+      return t('hiddenTweetRetweet', currentLanguage, {
+        retweetedBy: context.retweetedBy ?? '',
+        handle: context.handle ?? '',
+      });
     case 'quote-entire':
-      return `파딱 계정(${context.handle ?? ''})의 인용이 포함된 트윗이 숨겨졌습니다 (클릭하여 펼치기)`;
+      return t('hiddenTweetQuoteEntire', currentLanguage, {
+        quotedBy: context.quotedBy ?? '',
+        handle: context.handle ?? '',
+      });
     default:
-      return '숨겨진 트윗 (클릭하여 펼치기)';
+      return t('hiddenTweetClick', currentLanguage);
   }
 }

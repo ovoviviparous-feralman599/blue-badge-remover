@@ -14,11 +14,4 @@ export default defineConfig({
       '@features': resolve(__dirname, 'src/features'),
     },
   },
-  build: {
-    rollupOptions: {
-      input: {
-        'fetch-interceptor': resolve(__dirname, 'src/injected/fetch-interceptor.ts'),
-      },
-    },
-  },
 });

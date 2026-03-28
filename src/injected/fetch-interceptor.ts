@@ -47,12 +47,20 @@ window.fetch = async function patchedFetch(
   // Intercept GraphQL responses
   const isGraphQL = X_GRAPHQL_ENDPOINTS.some((ep) => url.includes(ep));
   if (isGraphQL) {
+    // DEBUG: 모든 GraphQL URL 로깅
+    console.log('[BBR DEBUG] GraphQL URL:', url.split('?')[0]);
+
     try {
       const cloned = response.clone();
       const data = await cloned.json();
       extractBadgeData(data);
       extractViewerUserId(data);
-      if (url.includes('Following') || url.includes('following')) {
+
+      // DEBUG: Following 관련 URL 확인
+      const urlLower = url.toLowerCase();
+      if (urlLower.includes('follow')) {
+        console.log('[BBR DEBUG] Follow-related URL detected:', url.split('?')[0]);
+        console.log('[BBR DEBUG] Follow response keys:', JSON.stringify(Object.keys(data?.data ?? data ?? {})));
         extractFollowData(data);
       }
     } catch {
@@ -145,6 +153,7 @@ function findViewerId(obj: unknown): string | null {
 function extractFollowData(data: unknown): void {
   const userIds: string[] = [];
   findFollowedUserIds(data, userIds);
+  console.log('[BBR DEBUG] extractFollowData found userIds:', userIds.length, userIds.slice(0, 5));
   if (userIds.length > 0) {
     window.postMessage({
       type: MESSAGE_TYPES.FOLLOW_DATA,

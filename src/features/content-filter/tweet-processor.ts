@@ -16,7 +16,8 @@ export interface TweetContext {
 export function shouldHideTweet(ctx: TweetContext): boolean {
   if (!ctx.settings.enabled) return false;
   if (!ctx.isFadak) return false;
-  if (ctx.followList.has(ctx.userId)) return false;
+  // followList 체크는 content script에서 수행 (idToHandle 매핑 필요)
+  // 여기서는 whitelist만 체크
   if (ctx.whitelist.has(ctx.handle)) return false;
 
   const filterMap: Record<PageType, boolean> = {

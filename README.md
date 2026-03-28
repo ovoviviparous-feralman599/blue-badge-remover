@@ -1,100 +1,143 @@
-# blue-badge-remover
+# Blue Badge Remover
 
-X(트위터)에서 수익성 목적의 파란 뱃지(Premium 구독) 계정을 숨기는 크롬 익스텐션. 팔로우 중인 계정과 수동 화이트리스트는 예외 처리.
+<p align="center">
+  <img src="public/icons/icon128.png" alt="Blue Badge Remover" width="96">
+</p>
 
-## 기능
+<p align="center">
+  <strong>X(Twitter)에서 수익성 파란 뱃지(Premium) 계정을 숨기는 크롬 익스텐션</strong><br>
+  팔로우 중인 계정과 화이트리스트는 예외 처리됩니다
+</p>
 
-- X 타임라인/답글/검색에서 수익성 파란 뱃지 계정의 트윗 자동 숨김
-- GraphQL API 응답 기반 정확한 파딱 판별 (레거시 인증/기관 계정 제외)
-- SVG 뱃지 감지 폴백 (골드/그레이 뱃지 구분)
-- 팔로우 중인 계정은 뱃지가 있어도 표시 (세션 토큰 자동 추출 + 동기화)
-- 수동 화이트리스트로 특정 계정 예외 처리
-- 리트윗/인용 트윗 필터링 (개별 토글)
-- 숨김 방식 선택: 완전 제거 / 접힌 상태로 표시
-- 계정 전환 시 팔로우 목록 자동 재동기화
-- Popup UI에서 모든 설정 관리
+<p align="center">
+  <img alt="Manifest V3" src="https://img.shields.io/badge/Manifest-V3-blue">
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-3178c6">
+  <img alt="License" src="https://img.shields.io/badge/License-MIT-green">
+</p>
 
-## 기술 스택
+---
 
-- **Language**: TypeScript (strict mode)
-- **Platform**: Chrome Extension (Manifest V3)
-- **Build**: Vite + CRXJS
-- **Test**: Vitest (45 tests)
+## Features
 
-## 설치 (개발)
+| 기능 | 설명 |
+|------|------|
+| **파딱 감지** | GraphQL API 응답 기반 판별 + SVG 뱃지 폴백 (레거시/기관 계정 제외) |
+| **숨김 범위** | 타임라인, 트윗 상세(답글), 검색 결과 (각각 토글) |
+| **숨김 방식** | 완전 제거 또는 접힌 상태로 표시 (클릭하여 펼치기) |
+| **리트윗 필터** | 팔로우가 파딱 트윗을 리트윗한 경우 숨김 (토글) |
+| **인용 필터** | 필터링 안 함 / 인용 부분만 숨기기 / 트윗 전체 숨기기 |
+| **팔로우 예외** | Following 페이지 방문 시 자동 수집, 계정별 캐시 |
+| **화이트리스트** | @핸들 직접 추가로 예외 처리 |
+| **계정 전환** | 계정별 팔로우 캐시 자동 전환 |
+| **다국어** | 한국어 / English / 日本語 |
+| **디버그 모드** | 트윗별 처리 라벨 + 콘솔 로그 |
+
+## Screenshots
+
+> TODO: Popup UI 스크린샷 추가
+
+## Install
+
+### Chrome Web Store
+
+> TODO: 출시 후 링크 추가
+
+### 개발 빌드
 
 ```bash
-# 1. 의존성 설치
+# 의존성 설치
 npm install
 
-# 2. 빌드
+# 빌드
 npm run build
 
-# 3. 테스트
+# 테스트
 npm run test
 ```
 
-## 크롬에 설치하기
+1. `chrome://extensions` 접속
+2. **개발자 모드** 활성화
+3. **압축 해제된 확장 프로그램을 로드합니다** 클릭
+4. `dist/` 폴더 선택
 
-### 개발 빌드 로드
+## Usage
 
-1. 프로젝트를 빌드합니다
-   ```bash
-   npm run build
-   ```
+1. **x.com에 로그인**
+2. 익스텐션 아이콘 클릭 -> **Popup UI** 에서 설정
+3. **팔로우 동기화**: Popup에서 "팔로잉 페이지 열기" -> 스크롤하면 자동 수집
+4. **화이트리스트**: 예외 처리할 계정의 @핸들 추가
 
-2. 크롬 브라우저에서 주소창에 `chrome://extensions` 를 입력하여 접속합니다
+### 숨김 동작
 
-3. 우측 상단의 **"개발자 모드"** 토글을 켭니다
+| 상황 | 동작 |
+|------|------|
+| 파딱의 직접 트윗 | 숨김 (팔로우/화이트리스트 제외) |
+| 팔로우가 파딱을 리트윗 | retweetFilter ON이면 숨김 |
+| 누군가 파딱을 인용 | quoteMode 설정에 따라 처리 |
+| 팔로우의 직접 트윗 | 파딱이어도 표시 |
 
-   ![개발자 모드](https://developer.chrome.com/static/docs/extensions/get-started/tutorial/hello-world/image/enable-developer-mode-bef48f284e498cc.png)
+## How It Works
 
-4. 좌측 상단의 **"압축 해제된 확장 프로그램을 로드합니다"** 버튼을 클릭합니다
-
-5. 프로젝트의 `dist/` 폴더를 선택합니다
-
-6. "Blue Badge Remover" 익스텐션이 목록에 나타나면 설치 완료입니다
-
-### 사용법
-
-1. x.com에 로그인합니다
-2. 익스텐션 아이콘을 클릭하여 Popup UI를 엽니다
-3. 마스터 ON/OFF로 전체 기능을 제어합니다
-4. 필터링 범위(타임라인/답글/검색), 숨김 방식, 리트윗/인용 트윗 설정을 조정합니다
-5. 팔로우 동기화 버튼을 눌러 팔로우 목록을 가져옵니다
-6. 화이트리스트에 예외 처리할 계정의 @핸들을 추가합니다
-
-### 개발 모드 (HMR)
-
-```bash
-npm run dev
+```
+x.com 페이지 로드
+  |
+  +-- fetch interceptor 주입 (XHR 패치)
+  |     +-- GraphQL 응답에서 뱃지 데이터 추출 (is_blue_verified + legacy.verified)
+  |     +-- Following API 응답에서 팔로우 핸들 추출 (core.screen_name)
+  |     +-- Bearer 토큰 / CSRF 토큰 자동 추출
+  |
+  +-- MutationObserver로 새 트윗 감지
+  |     +-- 작성자 핸들 추출 (socialContext 링크 건너뜀)
+  |     +-- 파딱 판별 (API 캐시 -> SVG 폴백)
+  |     +-- 팔로우/화이트리스트 예외 체크
+  |     +-- 숨김 처리 (remove / collapse + 맥락 정보)
+  |
+  +-- 인용 트윗: "인용" 텍스트 기반 블록 감지
+  +-- SPA 네비게이션: pushState/popstate 감지 -> 기존 트윗 재처리
 ```
 
-코드 변경 시 자동으로 익스텐션이 리로드됩니다. 개발 모드에서도 위와 동일한 방법으로 `dist/` 폴더를 크롬에 로드합니다.
+## Tech Stack
 
-## 프로젝트 구조
+- **TypeScript** (strict mode, noUncheckedIndexedAccess)
+- **Chrome Extension** Manifest V3
+- **Vite** + **CRXJS** (빌드)
+- **Vitest** (테스트)
+- 바닐라 HTML/CSS (Popup UI)
+
+## Project Structure
 
 ```
 src/
-├── background/              # Service Worker (팔로우 동기화)
-├── content/                 # Content Script (DOM 감시, 필터링)
-├── injected/                # 페이지 컨텍스트 스크립트 (fetch 인터셉트)
-├── popup/                   # Popup UI (설정 화면)
+├── background/              # Service Worker
+├── content/                 # Content Script (메인 로직)
+├── popup/                   # Popup UI (설정)
 ├── features/
-│   ├── badge-detection/     # D1: 뱃지 감지 (API 파싱 + SVG 폴백)
-│   ├── content-filter/      # D2: 콘텐츠 필터링 (MutationObserver)
-│   ├── follow-list/         # D3: 팔로우 동기화 & 화이트리스트
-│   └── settings/            # D4: 설정 관리 (Chrome Storage)
-└── shared/                  # 공통 타입, 유틸, 상수
+│   ├── badge-detection/     # 뱃지 감지 (API + SVG)
+│   ├── content-filter/      # 트윗 필터링 (Observer + Hider)
+│   ├── follow-list/         # 팔로우 동기화
+│   └── settings/            # Chrome Storage 래퍼
+├── shared/
+│   ├── types/               # Settings, BadgeInfo 등
+│   ├── constants/            # 기본값, 스토리지 키
+│   ├── utils/               # 구조화 로거
+│   └── i18n.ts              # 다국어 번역
+public/
+├── fetch-interceptor.js     # 페이지 컨텍스트 주입 스크립트
+├── icons/                   # 익스텐션 아이콘
+└── _locales/                # Chrome i18n (ko, en, ja)
 ```
 
-## 문서
+## Privacy
 
-| 문서 | 내용 |
-|------|------|
-| `docs/ARCHITECTURE.md` | 아키텍처, 의존성 규칙 |
-| `docs/REQUIREMENTS.md` | EARS 기반 요구사항 |
-| `docs/CONVENTIONS.md` | 작업/커밋/PR 컨벤션 |
-| `docs/CODE_REVIEW.md` | 코드 리뷰 규칙 |
-| `docs/RELIABILITY.md` | 에러 처리 정책 |
-| `docs/SECURITY.md` | 보안 정책 |
+- 수집하는 데이터: 없음
+- 외부 서버 통신: 없음 (모든 처리가 로컬)
+- 토큰/쿠키: `chrome.storage.local`에만 저장, 외부 전송 없음
+- 권한: `storage` + `x.com` host permission만 사용
+
+## License
+
+MIT
+
+## Author
+
+[@fotoner_p](https://x.com/fotoner_p)

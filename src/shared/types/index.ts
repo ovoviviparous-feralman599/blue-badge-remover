@@ -8,6 +8,8 @@ export interface Settings {
   hideMode: 'remove' | 'collapse';
   retweetFilter: boolean;
   quoteMode: 'off' | 'quote-only' | 'entire';
+  debugMode: boolean;
+  language: 'ko' | 'en' | 'ja';
 }
 
 export interface StorageSchema {

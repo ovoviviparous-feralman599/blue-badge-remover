@@ -24,10 +24,7 @@ describe('shouldHideTweet', () => {
     expect(shouldHideTweet(ctx)).toBe(false);
   });
 
-  it('should not hide when user is in follow list', () => {
-    const ctx = { ...baseContext, followList: new Set(['12345']) };
-    expect(shouldHideTweet(ctx)).toBe(false);
-  });
+  // followList 체크는 content script 레벨에서 수행 (idToHandle 매핑 필요)
 
   it('should not hide when user is in whitelist', () => {
     const ctx = { ...baseContext, whitelist: new Set(['@fadakuser']) };

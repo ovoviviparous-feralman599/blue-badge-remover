@@ -10,12 +10,15 @@ export const DEFAULT_SETTINGS: Settings = {
   hideMode: 'remove',
   retweetFilter: true,
   quoteMode: 'off',
+  debugMode: false,
+  language: 'ko',
 };
 
 export const STORAGE_KEYS = {
   SETTINGS: 'settings',
   WHITELIST: 'whitelist',
   FOLLOW_LIST: 'followList',
+  FOLLOW_CACHE: 'followCache',
   CURRENT_USER_ID: 'currentUserId',
   TOKEN: 'token',
   CSRF_TOKEN: 'csrfToken',
