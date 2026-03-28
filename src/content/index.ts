@@ -1,6 +1,6 @@
 // src/content/index.ts
 import { BadgeCache, parseBadgeInfo, detectBadgeSvg } from '@features/badge-detection';
-import { FeedObserver, shouldHideTweet, shouldHideRetweet, getQuoteAction, hideTweet, type PageType } from '@features/content-filter';
+import { FeedObserver, shouldHideTweet, shouldHideRetweet, getQuoteAction, hideTweet, hideQuoteBlock, type PageType } from '@features/content-filter';
 import { getSettings, getWhitelist } from '@features/settings';
 import { MESSAGE_TYPES, STORAGE_KEYS } from '@shared/constants';
 import type { Settings } from '@shared/types';
@@ -102,61 +102,117 @@ function getPageType(): PageType {
   return 'timeline';
 }
 
-function processTweet(tweetEl: HTMLElement): void {
-  const handleEl = tweetEl.querySelector('a[href^="/"]');
-  const handle = handleEl?.getAttribute('href')?.slice(1);
-  if (!handle) return;
-
+function extractTweetAuthor(tweetEl: HTMLElement): { handle: string; userId: string } | null {
+  const handleEl = tweetEl.querySelector('a[role="link"][href^="/"]');
+  const href = handleEl?.getAttribute('href');
+  if (!href) return null;
+  const handle = href.slice(1).split('/')[0];
+  if (!handle) return null;
   const userId = tweetEl.getAttribute('data-user-id') ?? handle;
+  return { handle, userId };
+}
 
+function checkFadak(userId: string, element: HTMLElement): boolean {
   let isFadak = badgeCache.get(userId);
   if (isFadak === undefined) {
-    isFadak = detectBadgeSvg(tweetEl);
+    isFadak = detectBadgeSvg(element);
     badgeCache.set(userId, isFadak);
   }
+  return isFadak;
+}
 
-  const hide = shouldHideTweet({
-    settings: currentSettings,
-    followList: followSet,
-    whitelist: whitelistSet,
-    isFadak,
-    userId,
-    handle: `@${handle}`,
-    pageType: getPageType(),
-  });
+function processTweet(tweetEl: HTMLElement): void {
+  const author = extractTweetAuthor(tweetEl);
+  if (!author) return;
 
-  if (hide) {
-    hideTweet(tweetEl, currentSettings.hideMode);
+  const { handle, userId } = author;
+  const isFadak = checkFadak(userId, tweetEl);
+
+  // 리트윗 감지: socialContext 존재 여부로 판단
+  const socialContext = tweetEl.querySelector('[data-testid="socialContext"]');
+  const isRetweet = socialContext !== null;
+
+  if (isRetweet) {
+    // 리트윗인 경우: 표시된 작성자가 원본 작성자
+    // socialContext에 리트윗한 사람의 이름이 있음
+    const retweeterName = socialContext?.textContent?.replace(/\s*Retweeted.*|reposted.*|님이.*리트윗.*|님이.*리포스트.*/i, '').trim() ?? '';
+
+    // 원본 작성자(author)가 파딱이면 숨김
+    const originalIsFadak = isFadak;
+
+    if (originalIsFadak) {
+      // 팔로우/화이트리스트 체크 (원본 작성자 기준)
+      if (followSet.has(userId) || whitelistSet.has(`@${handle}`)) {
+        return; // 예외 — 숨기지 않음
+      }
+
+      const hideRetweet = shouldHideRetweet({
+        settings: currentSettings,
+        isFadak: true,
+        isRetweet: true,
+      });
+      if (hideRetweet) {
+        hideTweet(tweetEl, currentSettings.hideMode, {
+          reason: 'retweet',
+          handle: `@${handle}`,
+          retweetedBy: retweeterName || undefined,
+        });
+        return;
+      }
+    }
+    // 리트윗이지만 원본이 파딱 아님 → 통과
     return;
   }
 
-  // Check if this is a retweet of a fadak account
-  const isRetweet = tweetEl.querySelector('[data-testid="socialContext"]') !== null;
-  if (isRetweet && isFadak) {
-    const hideRetweet = shouldHideRetweet({
+  // 1순위: 직접 트윗 — 작성자가 파딱인가?
+  if (isFadak) {
+    const hide = shouldHideTweet({
       settings: currentSettings,
+      followList: followSet,
+      whitelist: whitelistSet,
       isFadak: true,
-      isRetweet: true,
+      userId,
+      handle: `@${handle}`,
+      pageType: getPageType(),
     });
-    if (hideRetweet) {
-      hideTweet(tweetEl, currentSettings.hideMode);
+
+    if (hide) {
+      hideTweet(tweetEl, currentSettings.hideMode, {
+        reason: 'fadak',
+        handle: `@${handle}`,
+      });
       return;
     }
   }
 
-  // Check for quote tweets containing fadak content
+  // 3순위: 인용 트윗 — 인용된 계정이 파딱인가?
   const quoteBlock = tweetEl.querySelector('[data-testid="quoteTweet"]') as HTMLElement | null;
   if (quoteBlock) {
-    // Check if the quoted tweet's author is fadak
-    const quoteBadge = detectBadgeSvg(quoteBlock);
-    const quoteAction = getQuoteAction(currentSettings, quoteBadge);
-    if (quoteAction === 'hide-entire') {
-      hideTweet(tweetEl, currentSettings.hideMode);
-      return;
+    const quoteAuthor = extractTweetAuthor(quoteBlock);
+    const quotedHandle = quoteAuthor?.handle;
+    const quotedUserId = quoteAuthor?.userId ?? '';
+
+    let quotedIsFadak = false;
+    if (quotedUserId) {
+      quotedIsFadak = checkFadak(quotedUserId, quoteBlock);
+    } else {
+      quotedIsFadak = detectBadgeSvg(quoteBlock);
     }
-    if (quoteAction === 'hide-quote') {
-      hideTweet(quoteBlock, currentSettings.hideMode);
-      return;
+
+    // 인용된 사람이 팔로우/화이트리스트면 예외
+    if (quotedIsFadak && !followSet.has(quotedUserId) && !whitelistSet.has(`@${quotedHandle ?? ''}`)) {
+      const quoteAction = getQuoteAction(currentSettings, true);
+      if (quoteAction === 'hide-entire') {
+        hideTweet(tweetEl, currentSettings.hideMode, {
+          reason: 'quote-entire',
+          handle: `@${quotedHandle ?? ''}`,
+        });
+        return;
+      }
+      if (quoteAction === 'hide-quote') {
+        hideQuoteBlock(quoteBlock, { handle: `@${quotedHandle ?? ''}` });
+        return;
+      }
     }
   }
 }
