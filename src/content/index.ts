@@ -498,36 +498,39 @@ const FADAK_BANNER_ID = 'bbr-fadak-profile-banner';
 
 function showFadakProfileBanner(): void {
   if (!isProfilePage() || !currentSettings.enabled) return;
-  // 이미 배너가 있으면 스킵
   if (document.getElementById(FADAK_BANNER_ID)) return;
 
-  // 프로필 페이지의 핸들 추출
   const pathHandle = window.location.pathname.split('/')[1];
   if (!pathHandle) return;
-
-  // 팔로우 중이면 배너 안 표시
   if (isHandleFollowed(pathHandle)) return;
 
-  // 파딱인지 확인 (뱃지 SVG로)
-  setTimeout(() => {
-    const header = document.querySelector('[data-testid="primaryColumn"]') ?? document.querySelector('main');
-    if (!header) return;
-
-    // 프로필 영역에서 인증 뱃지 확인
-    const verifiedBadge = header.querySelector('[data-testid="icon-verified"]');
-    if (!verifiedBadge) return;
+  function tryInsertBanner(): boolean {
+    const stickyHeader = document.querySelector('[data-testid="primaryColumn"] > div > div:first-child');
+    if (!stickyHeader) return false;
+    const verifiedBadge = stickyHeader.querySelector('[data-testid="icon-verified"]');
+    if (!verifiedBadge) return false;
+    if (document.getElementById(FADAK_BANNER_ID)) return true;
 
     const banner = document.createElement('div');
     banner.id = FADAK_BANNER_ID;
-    banner.textContent = t('fadakProfileBanner', currentSettings.language, { handle: pathHandle });
+    banner.textContent = t('fadakProfileBanner', currentSettings.language, { handle: pathHandle ?? '' });
     banner.style.cssText = 'background:#F4212E;color:white;text-align:center;padding:6px 16px;font-size:13px;font-weight:500;';
+    stickyHeader.appendChild(banner);
+    return true;
+  }
 
-    // sticky 헤더 안에 삽입 (같은 sticky 블록에 포함되어야 함)
-    const stickyHeader = document.querySelector('[data-testid="primaryColumn"] > div > div:first-child');
-    if (stickyHeader) {
-      stickyHeader.appendChild(banner);
+  if (tryInsertBanner()) return;
+
+  // 뱃지가 아직 렌더링되지 않았으면 MutationObserver로 감지
+  const target = document.querySelector('[data-testid="primaryColumn"]') ?? document.body;
+  const obs = new MutationObserver(() => {
+    if (tryInsertBanner()) {
+      obs.disconnect();
     }
-  }, 1500);
+  });
+  obs.observe(target, { childList: true, subtree: true });
+  // 안전장치: 10초 후 해제
+  setTimeout(() => obs.disconnect(), 10000);
 }
 
 function removeFadakBanner(): void {
