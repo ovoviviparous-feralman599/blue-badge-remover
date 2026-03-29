@@ -7,7 +7,7 @@ import type { Settings } from '@shared/types';
 import { logger } from '@shared/utils/logger';
 import { showFadakProfileBanner, removeFadakBanner } from './fadak-banner';
 import { listenForNavigation, setOnNavigate } from './navigation';
-import { collectFollowsFromDOM, saveFollowHandles, getMyHandle, disconnectFollowObserver } from './follow-collector';
+import { collectFollowsFromDOM, saveFollowHandles, removeFollowHandle, getMyHandle, disconnectFollowObserver, listenForFollowButtonClicks } from './follow-collector';
 import { extractTweetAuthor, extractRetweeterName, findQuoteBlock, extractQuoteAuthor, extractDisplayName, formatUserLabel, addDebugLabel } from './tweet-processing';
 import { isProfilePage, getPageType } from './page-utils';
 
@@ -40,7 +40,7 @@ async function init(): Promise<void> {
   setOnNavigate(handleNavigate);
   listenForNavigation();
   collectFollowsFromDOM(followCollectorDeps);
-  listenForFollowButtonClicks();
+  listenForFollowButtonClicks(followCollectorDeps);
 
   setTimeout(() => {
     detectAndHandleAccountSwitch();
@@ -131,6 +131,13 @@ const fadakBannerDeps = {
 const followCollectorDeps = {
   getCurrentSettings: () => currentSettings,
   setFollowSet: (set: Set<string>) => { followSet = set; },
+  getFollowSet: () => followSet,
+  onFollowed: (_handle: string) => {
+    removeFadakBanner();
+  },
+  onUnfollowed: (_handle: string) => {
+    showFadakProfileBanner(fadakBannerDeps);
+  },
 };
 
 async function detectAndHandleAccountSwitch(): Promise<void> {
@@ -226,27 +233,6 @@ function processTweet(tweetEl: HTMLElement): void {
       }
     }
   }
-}
-
-function listenForFollowButtonClicks(): void {
-  // 팔로우 버튼 클릭 감지: aria-label="팔로우 @handle" 또는 "Following @handle"
-  document.addEventListener('click', (e) => {
-    const target = e.target as HTMLElement;
-    const button = target.closest('button[aria-label]');
-    if (!button) return;
-    const label = button.getAttribute('aria-label') ?? '';
-    const match = label.match(/^(?:팔로우|Follow)\s+@(\S+)$/i);
-    if (!match?.[1]) return;
-    const handle = match[1].toLowerCase();
-    // followSet에 추가 + storage에 저장
-    if (!followSet.has(handle)) {
-      followSet.add(handle);
-      void saveFollowHandles([handle], followCollectorDeps);
-      if (currentSettings.debugMode) logger.info('Follow button clicked, added to follow list', { handle });
-      // 배너가 있으면 제거 (방금 팔로우했으니까)
-      removeFadakBanner();
-    }
-  }, true);
 }
 
 function startObserving(): void {

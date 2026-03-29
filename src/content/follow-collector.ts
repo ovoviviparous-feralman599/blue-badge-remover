@@ -6,6 +6,9 @@ import { logger } from '@shared/utils/logger';
 export interface FollowCollectorDeps {
   getCurrentSettings: () => Settings;
   setFollowSet: (set: Set<string>) => void;
+  getFollowSet?: () => Set<string>;
+  onFollowed?: (handle: string) => void;
+  onUnfollowed?: (handle: string) => void;
 }
 
 let followObserver: MutationObserver | null = null;
@@ -37,6 +40,28 @@ export async function saveFollowHandles(
   deps.setFollowSet(new Set(merged));
   const settings = deps.getCurrentSettings();
   if (settings.debugMode) logger.info('Follow handles saved', { account: currentAccount, newCount: handles.length, totalCount: merged.length });
+}
+
+export async function removeFollowHandle(
+  handle: string,
+  deps: FollowCollectorDeps,
+): Promise<void> {
+  const lower = handle.toLowerCase();
+  const stored = await chrome.storage.local.get([STORAGE_KEYS.FOLLOW_CACHE, STORAGE_KEYS.CURRENT_USER_ID]);
+  const currentAccount = (stored[STORAGE_KEYS.CURRENT_USER_ID] as string | null) ?? '';
+  const cache = (stored[STORAGE_KEYS.FOLLOW_CACHE] as Record<string, string[]> | undefined) ?? {};
+  const existing = currentAccount ? (cache[currentAccount] ?? []) : [];
+  const filtered = existing.filter((h) => h !== lower);
+  if (currentAccount) {
+    cache[currentAccount] = filtered;
+  }
+  await chrome.storage.local.set({
+    [STORAGE_KEYS.FOLLOW_CACHE]: cache,
+    [STORAGE_KEYS.FOLLOW_LIST]: filtered,
+  });
+  deps.setFollowSet(new Set(filtered));
+  const settings = deps.getCurrentSettings();
+  if (settings.debugMode) logger.info('Follow handle removed', { handle: lower, totalCount: filtered.length });
 }
 
 function extractHandlesFromDOM(): string[] {
@@ -84,4 +109,40 @@ export function disconnectFollowObserver(): void {
     followObserver.disconnect();
     followObserver = null;
   }
+}
+
+export function listenForFollowButtonClicks(deps: FollowCollectorDeps): void {
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const button = target.closest('button[aria-label]');
+    if (!button) return;
+    const label = button.getAttribute('aria-label') ?? '';
+    const followSet = deps.getFollowSet?.() ?? new Set<string>();
+
+    // 팔로우: "팔로우 @handle" / "Follow @handle"
+    const followMatch = label.match(/^(?:팔로우|Follow)\s+@(\S+)$/i);
+    if (followMatch?.[1]) {
+      const handle = followMatch[1].toLowerCase();
+      if (!followSet.has(handle)) {
+        followSet.add(handle);
+        void saveFollowHandles([handle], deps);
+        deps.onFollowed?.(handle);
+      }
+      return;
+    }
+
+    // 언팔: "팔로잉 @handle" / "Following @handle"
+    const unfollowMatch = label.match(/^(?:팔로잉|Following)\s+@(\S+)$/i);
+    if (unfollowMatch?.[1]) {
+      const handle = unfollowMatch[1].toLowerCase();
+      setTimeout(() => {
+        const updatedLabel = button.getAttribute('aria-label') ?? '';
+        if (/^(?:팔로우|Follow)\s+@/i.test(updatedLabel)) {
+          followSet.delete(handle);
+          void removeFollowHandle(handle, deps);
+          deps.onUnfollowed?.(handle);
+        }
+      }, 2000);
+    }
+  }, true);
 }
