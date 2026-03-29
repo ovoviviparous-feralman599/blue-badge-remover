@@ -54,6 +54,7 @@ type TranslationKeys =
   | 'feedback'
   | 'feedbackDesc'
   | 'keywordFilterBeta'
+  | 'keywordFilterBetaDesc'
   | 'advancedFilterSettings';
 
 type Translations = Record<TranslationKeys, string>;
@@ -108,6 +109,7 @@ const ko: Translations = {
   feedback: '피드백 보내기',
   feedbackDesc: '버그 제보, 기능 제안 등 여러분의 피드백이 서비스 개선에 큰 도움이 됩니다',
   keywordFilterBeta: '[Beta] 키워드 필터',
+  keywordFilterBetaDesc: '모든 파딱이 아닌, 특정 키워드에 해당하는 바이오나 본문을 가지고 있는 글만 가립니다. 가끔 유용한 정보 파딱 등의 글을 보고 싶은 분들에게 추천입니다.',
   advancedFilterSettings: '고급 필터 설정',
 };
 
@@ -161,6 +163,7 @@ const en: Translations = {
   feedback: 'Send Feedback',
   feedbackDesc: 'Bug reports and feature suggestions help us improve the extension',
   keywordFilterBeta: '[Beta] Keyword Filter',
+  keywordFilterBetaDesc: 'It does not hide all Paid badge posts, but only those containing specific keywords in the bio or the main text. This is recommended for users who occasionally want to see useful information from Paid badge holders.',
   advancedFilterSettings: 'Advanced Filter Settings',
 };
 
@@ -214,6 +217,7 @@ const ja: Translations = {
   feedback: 'フィードバックを送る',
   feedbackDesc: 'バグ報告や機能提案は、サービス改善に大きく役立ちます',
   keywordFilterBeta: '[Beta] キーワードフィルター',
+  keywordFilterBetaDesc: 'すべての課金バッジの投稿を非表示にするのではなく、プロフィールや本文に特定のキーワードが含まれている投稿のみを非表示にします。時々、課金バッジユーザーによる有益な情報を確認したい方に適しています。',
   advancedFilterSettings: '高度なフィルター設定',
 };
 

@@ -176,6 +176,7 @@ body {
 /* ── Keyword Distribution Section ── */
 
 .keywords-section {
+  display: none;
   margin-bottom: 20px;
   padding: 16px;
   background: #16181c;
