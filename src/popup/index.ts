@@ -55,10 +55,6 @@ function renderSettings(): void {
     settings.keywordCollectorEnabled;
   const filterModeGroup = document.getElementById('filter-mode-group') as HTMLElement;
   filterModeGroup.style.display = settings.keywordFilterEnabled ? 'block' : 'none';
-  const filterModeRadio = document.querySelector(
-    `input[name="filterMode"][value="${settings.filterMode}"]`,
-  ) as HTMLInputElement | null;
-  if (filterModeRadio) filterModeRadio.checked = true;
 }
 
 async function renderWhitelist(): Promise<void> {
@@ -121,11 +117,6 @@ function bindEvents(): void {
     settings.keywordCollectorEnabled = (
       document.getElementById('keywordCollectorEnabled') as HTMLInputElement
     ).checked;
-    settings.filterMode =
-      (
-        (document.querySelector('input[name="filterMode"]:checked') as HTMLInputElement | null)
-          ?.value as Settings['filterMode']
-      ) ?? 'all';
     await saveSettings(settings);
   };
 

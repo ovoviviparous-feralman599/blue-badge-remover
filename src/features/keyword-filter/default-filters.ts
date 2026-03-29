@@ -1,5 +1,44 @@
 export const DEFAULT_FILTER_LIST = `! Blue Badge Remover - 기본 필터 리스트 (Beta)
 ! 악성 파딱 키워드 필터
 
+🇰🇷
+🇺🇸
+단결
+반국가
+공산당
+자유
+럼프
+premium
+한미일
+멸공
+투자
+우파
+좌파
+중도
+freedom
+애국
+부동산
+주식
+코인
+종목
+BTC
+ETH
+DOGE
+곰돌이
+진핑
+LUNA
+ADA
+SOL
+BNB
+XRP
+USDT
+USDC
 테슬라
+병신
+새끼
+미쳤다
+오와
+와우
+그런가요
+감사합니다
 년차`;

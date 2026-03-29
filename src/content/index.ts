@@ -199,8 +199,7 @@ function listenForSettingsChanges(): void {
         void flushCollector();
       }
       const modeChanged =
-        prev.keywordFilterEnabled !== currentSettings.keywordFilterEnabled ||
-        prev.filterMode !== currentSettings.filterMode;
+        prev.keywordFilterEnabled !== currentSettings.keywordFilterEnabled;
       if (modeChanged) {
         restoreHiddenTweets();
         reprocessExistingTweets();
@@ -314,7 +313,7 @@ function processTweet(tweetEl: HTMLElement): void {
         const profile = cachedProfile ?? { handle, displayName: extractDisplayName(tweetEl, handle) ?? handle, bio: fiberBio };
         bufferCollectedFadak(handle.toLowerCase(), handle, profile.displayName, profile.bio || fiberBio, extractTweetText(tweetEl));
       }
-      if (currentSettings.keywordFilterEnabled && currentSettings.filterMode === 'keyword') {
+      if (currentSettings.keywordFilterEnabled) {
         const profile = cachedProfile ?? {
           handle,
           displayName: extractDisplayName(tweetEl, handle) ?? handle,
@@ -340,7 +339,7 @@ function processTweet(tweetEl: HTMLElement): void {
       const profile = cachedProfile ?? { handle, displayName: displayName ?? handle, bio: fiberBio };
       bufferCollectedFadak(handle.toLowerCase(), handle, profile.displayName, profile.bio || fiberBio, extractTweetText(tweetEl));
     }
-    if (currentSettings.keywordFilterEnabled && currentSettings.filterMode === 'keyword') {
+    if (currentSettings.keywordFilterEnabled) {
       const profile = cachedProfile ?? {
         handle,
         displayName: displayName ?? handle,

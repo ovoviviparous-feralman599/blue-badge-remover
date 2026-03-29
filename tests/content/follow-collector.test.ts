@@ -69,7 +69,7 @@ describe('collectFollowsFromDOM - guard: myHandle !== pathUser', () => {
         debugMode: false,
         language: 'ko',
         keywordFilterEnabled: false,
-        filterMode: 'all',
+        keywordCollectorEnabled: false,
       }),
       setFollowSet: vi.fn(),
     };

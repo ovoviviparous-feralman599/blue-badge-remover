@@ -54,9 +54,6 @@ type TranslationKeys =
   | 'feedback'
   | 'feedbackDesc'
   | 'keywordFilterBeta'
-  | 'filterModeLabel'
-  | 'filterModeAll'
-  | 'filterModeKeyword'
   | 'advancedFilterSettings';
 
 type Translations = Record<TranslationKeys, string>;
@@ -111,9 +108,6 @@ const ko: Translations = {
   feedback: '피드백 보내기',
   feedbackDesc: '버그 제보, 기능 제안 등 여러분의 피드백이 서비스 개선에 큰 도움이 됩니다',
   keywordFilterBeta: '[Beta] 키워드 필터',
-  filterModeLabel: '필터 모드',
-  filterModeAll: '전체 숨김',
-  filterModeKeyword: '키워드만 숨김',
   advancedFilterSettings: '고급 필터 설정',
 };
 
@@ -167,9 +161,6 @@ const en: Translations = {
   feedback: 'Send Feedback',
   feedbackDesc: 'Bug reports and feature suggestions help us improve the extension',
   keywordFilterBeta: '[Beta] Keyword Filter',
-  filterModeLabel: 'Filter Mode',
-  filterModeAll: 'Hide All',
-  filterModeKeyword: 'Keyword Only',
   advancedFilterSettings: 'Advanced Filter Settings',
 };
 
@@ -223,9 +214,6 @@ const ja: Translations = {
   feedback: 'フィードバックを送る',
   feedbackDesc: 'バグ報告や機能提案は、サービス改善に大きく役立ちます',
   keywordFilterBeta: '[Beta] キーワードフィルター',
-  filterModeLabel: 'フィルターモード',
-  filterModeAll: 'すべて非表示',
-  filterModeKeyword: 'キーワードのみ非表示',
   advancedFilterSettings: '高度なフィルター設定',
 };
 

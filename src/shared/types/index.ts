@@ -11,7 +11,6 @@ export interface Settings {
   debugMode: boolean;
   language: 'ko' | 'en' | 'ja';
   keywordFilterEnabled: boolean;
-  filterMode: 'all' | 'keyword';
   keywordCollectorEnabled: boolean;
 }
 

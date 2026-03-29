@@ -1,16 +1,39 @@
-import { getCollectedFadaks, clearCollectedFadaks } from '@features/keyword-collector';
-import type { CollectedFadak } from '@shared/types';
+import { getCollectedFadaks, clearCollectedFadaks, countTokens, topN } from '@features/keyword-collector';
+import { getCustomFilterList, parseFilterList, DEFAULT_FILTER_LIST } from '@features/keyword-filter';
+import type { CollectedFadak, FilterRule } from '@shared/types';
+
+let hideFiltered = false;
+let cachedList: CollectedFadak[] = [];
+let filterRules: FilterRule[] = [];
+
+async function loadFilterRules(): Promise<FilterRule[]> {
+  const custom = await getCustomFilterList();
+  return parseFilterList(DEFAULT_FILTER_LIST + '\n' + custom);
+}
+
+function isTokenFiltered(token: string, rules: FilterRule[]): boolean {
+  return rules.some((rule) => {
+    if (rule.type === 'keyword') return token.includes(rule.value.toLowerCase());
+    if (rule.type === 'wildcard') return rule.pattern.test(token);
+    return false;
+  });
+}
 
 async function init(): Promise<void> {
-  const list = await getCollectedFadaks();
+  const [list, rules] = await Promise.all([getCollectedFadaks(), loadFilterRules()]);
+  cachedList = list;
+  filterRules = rules;
   renderStats(list);
+  renderKeywords(list);
   renderList(list);
   bindEvents();
 
   chrome.storage.onChanged.addListener((changes) => {
     if (changes['collectedFadaks']) {
       const updated = (changes['collectedFadaks'].newValue as CollectedFadak[] | undefined) ?? [];
+      cachedList = updated;
       renderStats(updated);
+      renderKeywords(updated);
       renderList(updated);
     }
   });
@@ -21,6 +44,95 @@ function renderStats(list: CollectedFadak[]): void {
   const totalTweets = list.reduce((sum, f) => sum + f.tweetTexts.length, 0);
   document.getElementById('stats')!.textContent =
     `${total}개 계정 · ${totalTweets}개 트윗`;
+}
+
+function buildKeywordRow(token: string, count: number, rank: number, max: number): HTMLElement {
+  const row = document.createElement('div');
+  row.className = 'kw-row';
+
+  const rankEl = document.createElement('span');
+  rankEl.className = 'kw-rank';
+  rankEl.textContent = String(rank);
+
+  const label = document.createElement('span');
+  label.className = 'kw-label';
+  label.textContent = token;
+
+  const barWrap = document.createElement('div');
+  barWrap.className = 'kw-bar-wrap';
+
+  const bar = document.createElement('div');
+  bar.className = 'kw-bar';
+  bar.style.width = `${Math.round((count / max) * 100)}%`;
+  barWrap.appendChild(bar);
+
+  const countEl = document.createElement('span');
+  countEl.className = 'kw-count';
+  countEl.textContent = String(count);
+
+  row.append(rankEl, label, barWrap, countEl);
+  return row;
+}
+
+function renderKeywords(list: CollectedFadak[]): void {
+  const section = document.getElementById('keywords')!;
+
+  const allTexts: string[] = [];
+  for (const fadak of list) {
+    if (fadak.bio) allTexts.push(fadak.bio);
+    for (const t of fadak.tweetTexts) allTexts.push(t);
+  }
+
+  if (allTexts.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  const counts = countTokens(allTexts);
+  let top = topN(counts, 30);
+  if (hideFiltered) {
+    top = top.filter(({ token }) => !isTokenFiltered(token, filterRules));
+  }
+  const max = top[0]?.count ?? 1;
+
+  section.style.display = 'block';
+  section.innerHTML = '';
+
+  const headingRow = document.createElement('div');
+  headingRow.className = 'keywords-heading-row';
+
+  const heading = document.createElement('h2');
+  heading.className = 'keywords-heading';
+  heading.textContent = '자주 사용되는 키워드 Top 30';
+
+  const toggleBtn = document.createElement('button');
+  toggleBtn.type = 'button';
+  toggleBtn.className = 'kw-toggle' + (hideFiltered ? ' active' : '');
+  toggleBtn.textContent = '필터 미포함만';
+  toggleBtn.addEventListener('click', () => {
+    hideFiltered = !hideFiltered;
+    renderKeywords(cachedList);
+  });
+
+  headingRow.append(heading, toggleBtn);
+  section.appendChild(headingRow);
+
+  if (top.length === 0) {
+    const empty = document.createElement('p');
+    empty.className = 'kw-empty';
+    empty.textContent = '필터 미포함 키워드가 없습니다.';
+    section.appendChild(empty);
+    return;
+  }
+
+  const chart = document.createElement('div');
+  chart.className = 'keywords-chart';
+
+  top.forEach(({ token, count }, i) => {
+    chart.appendChild(buildKeywordRow(token, count, i + 1, max));
+  });
+
+  section.appendChild(chart);
 }
 
 function renderList(list: CollectedFadak[]): void {

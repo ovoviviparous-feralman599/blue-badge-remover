@@ -13,7 +13,6 @@ export const DEFAULT_SETTINGS: Settings = {
   debugMode: false,
   language: 'ko',
   keywordFilterEnabled: false,
-  filterMode: 'all',
   keywordCollectorEnabled: false,
 };
 

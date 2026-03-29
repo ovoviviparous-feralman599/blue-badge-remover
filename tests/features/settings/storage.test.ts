@@ -42,7 +42,6 @@ describe('getSettings', () => {
     const settings = await getSettings();
     expect(settings.enabled).toBe(true);
     expect(settings.keywordFilterEnabled).toBe(DEFAULT_SETTINGS.keywordFilterEnabled);
-    expect(settings.filterMode).toBe(DEFAULT_SETTINGS.filterMode);
   });
 });
 
