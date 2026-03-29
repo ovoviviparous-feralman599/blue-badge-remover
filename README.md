@@ -129,21 +129,9 @@ public/
 - 권한: `storage` + `x.com` host permission만 사용
 - 상세: [PRIVACY_POLICY.md](PRIVACY_POLICY.md)
 
-## Legal & Disclaimer
+## Disclaimer
 
-> **This extension modifies the user's local browser display only. It does not access, modify, or interfere with X's servers or API.**
-
-### 왜 합법인가?
-
-- **클라이언트 사이드 DOM 조작** — 서버 데이터를 변조하는 것이 아니라, 사용자 브라우저에서 보이는 화면만 숨기는 것입니다. 광고 차단기(uBlock Origin, AdBlock)와 완전히 같은 원리입니다.
-- **X API 직접 호출 안 함** — X API를 우회하거나 스크래핑하지 않습니다. 이미 로드된 페이지의 응답에서 파란 뱃지 여부만 확인합니다.
-- **선례 충분** — AdBlock, Stylus, Tampermonkey 등 DOM 조작 확장 프로그램은 수십 년째 합법적으로 운영되고 있으며, 법원 판결도 "사용자가 자신의 브라우저를 커스터마이즈할 권리"를 인정하고 있습니다.
-
-### 주의할 점
-
-- **X ToS**: DOM 숨기기는 "서비스 방해"에 해당하지 않지만, X가 기술적으로 대응할 수는 있습니다 (DOM 구조 변경 등).
-- **상표권**: "Blue Badge Remover"는 일반 명사이며, X/Twitter의 로고나 상표를 사용하지 않습니다.
-- **수익화**: 현재 무료 오픈소스 배포로, 상업적 이슈가 없습니다.
+> This extension modifies the user's local browser display only. It does not access, modify, or interfere with X's servers or API.
 
 ## License
 
