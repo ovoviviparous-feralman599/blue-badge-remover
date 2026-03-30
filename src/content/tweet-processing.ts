@@ -155,6 +155,16 @@ export function extractDisplayName(tweetEl: HTMLElement, handle: string): string
   return null;
 }
 
+/**
+ * Returns true only if the tweet's own author area ([data-testid="User-Name"]) contains
+ * a verified badge. Used by the keyword collector to avoid collecting non-파딱 accounts
+ * that happen to quote a 파딱 (whose badge would otherwise appear inside the same article).
+ */
+export function hasBadgeInAuthorArea(tweetEl: HTMLElement): boolean {
+  const userNameEl = tweetEl.querySelector('[data-testid="User-Name"]');
+  return !!(userNameEl ?? tweetEl).querySelector('[data-testid="icon-verified"]');
+}
+
 export function formatUserLabel(handle: string, displayName: string | null): string {
   return displayName ? `${displayName}(@${handle})` : `@${handle}`;
 }

@@ -10,7 +10,7 @@ import { logger } from '@shared/utils/logger';
 import { showFadakProfileBanner, removeFadakBanner } from './fadak-banner';
 import { listenForNavigation, setOnNavigate } from './navigation';
 import { collectFollowsFromDOM, saveFollowHandles, removeFollowHandle, getMyHandle, disconnectFollowObserver, listenForFollowButtonClicks } from './follow-collector';
-import { extractTweetAuthor, extractRetweeterName, findQuoteBlock, extractQuoteAuthor, extractDisplayName, extractTweetText, extractBioFromFiber, formatUserLabel, addDebugLabel } from './tweet-processing';
+import { extractTweetAuthor, extractRetweeterName, findQuoteBlock, extractQuoteAuthor, extractDisplayName, extractTweetText, extractBioFromFiber, formatUserLabel, addDebugLabel, hasBadgeInAuthorArea } from './tweet-processing';
 import { isProfilePage, getPageType } from './page-utils';
 
 const badgeCache = new BadgeCache();
@@ -317,7 +317,7 @@ function processTweet(tweetEl: HTMLElement): void {
       if (isHandleFollowed(handle) || whitelistSet.has(`@${handle}`)) return;
       const cachedProfile = profileCache.get(handle.toLowerCase());
       const fiberBio = cachedProfile?.bio || extractBioFromFiber(tweetEl, handle);
-      if (currentSettings.keywordCollectorEnabled) {
+      if (currentSettings.keywordCollectorEnabled && hasBadgeInAuthorArea(tweetEl)) {
         const profile = cachedProfile ?? { handle, displayName: extractDisplayName(tweetEl, handle) ?? handle, bio: fiberBio };
         bufferCollectedFadak(handle.toLowerCase(), handle, profile.displayName, profile.bio || fiberBio, extractTweetText(tweetEl));
       }
@@ -343,7 +343,7 @@ function processTweet(tweetEl: HTMLElement): void {
   if (isFadak && !inFollow) {
     const cachedProfile = profileCache.get(handle.toLowerCase());
     const fiberBio = cachedProfile?.bio || extractBioFromFiber(tweetEl, handle);
-    if (currentSettings.keywordCollectorEnabled) {
+    if (currentSettings.keywordCollectorEnabled && hasBadgeInAuthorArea(tweetEl)) {
       const profile = cachedProfile ?? { handle, displayName: displayName ?? handle, bio: fiberBio };
       bufferCollectedFadak(handle.toLowerCase(), handle, profile.displayName, profile.bio || fiberBio, extractTweetText(tweetEl));
     }
