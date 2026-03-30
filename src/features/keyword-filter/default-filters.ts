@@ -17,6 +17,7 @@ premium
 우파
 좌파
 중도
+아저씨
 freedom
 애국
 부동산
