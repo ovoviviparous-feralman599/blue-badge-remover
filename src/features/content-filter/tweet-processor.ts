@@ -8,7 +8,6 @@ export interface TweetContext {
   followList: Set<string>;
   whitelist: Set<string>;
   isFadak: boolean;
-  userId: string;
   handle: string;
   pageType: PageType;
 }

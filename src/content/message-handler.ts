@@ -10,6 +10,22 @@ import { removeFadakBanner } from './fadak-banner';
 
 let domFollowReprocessTimer: ReturnType<typeof setTimeout> | null = null;
 
+function isProfileDataPayload(data: unknown): data is { profiles: Array<{ userId: string; handle: string; displayName: string; bio: string }> } {
+  if (!data || typeof data !== 'object') return false;
+  const d = data as Record<string, unknown>;
+  if (!Array.isArray(d['profiles'])) return false;
+  return d['profiles'].every((p: unknown) =>
+    p !== null && typeof p === 'object' &&
+    typeof (p as Record<string, unknown>)['handle'] === 'string',
+  );
+}
+
+function isFollowDataPayload(data: unknown): data is { handles: string[]; source?: string } {
+  if (!data || typeof data !== 'object') return false;
+  const d = data as Record<string, unknown>;
+  return Array.isArray(d['handles']) && d['handles'].every((h: unknown) => typeof h === 'string');
+}
+
 export function listenForMessages(followCollectorDeps: FollowCollectorDeps): void {
   window.addEventListener('message', (event) => {
     if (event.source !== window || event.origin !== window.location.origin) return;
@@ -17,10 +33,10 @@ export function listenForMessages(followCollectorDeps: FollowCollectorDeps): voi
     if (event.data?.type === MESSAGE_TYPES.BADGE_DATA) {
       handleBadgeData(event.data);
     }
-    if (event.data?.type === MESSAGE_TYPES.PROFILE_DATA) {
+    if (event.data?.type === MESSAGE_TYPES.PROFILE_DATA && isProfileDataPayload(event.data)) {
       handleProfileData(event.data);
     }
-    if (event.data?.type === MESSAGE_TYPES.FOLLOW_DATA) {
+    if (event.data?.type === MESSAGE_TYPES.FOLLOW_DATA && isFollowDataPayload(event.data)) {
       handleFollowData(event.data, followCollectorDeps);
     }
   });
@@ -31,6 +47,9 @@ function handleBadgeData(data: { users: unknown[] }): void {
     const badge = parseBadgeInfo(userData);
     if (badge) {
       badgeCache.set(badge.userId, badge.isBluePremium);
+      if (badge.handle) {
+        badgeCache.set(badge.handle.toLowerCase(), badge.isBluePremium);
+      }
     }
   }
 }

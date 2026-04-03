@@ -57,6 +57,8 @@ export const TIMINGS = {
   SYNC_BANNER_DISMISS: 60000,
   /** 언팔로우 감지 지연 */
   UNFOLLOW_DETECT_DELAY: 2000,
+  /** reprocessExistingTweets 프레임당 처리 트윗 수 */
+  REPROCESS_CHUNK_SIZE: 10,
 } as const;
 
 export const MESSAGE_TYPES = {

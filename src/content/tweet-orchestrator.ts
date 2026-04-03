@@ -1,6 +1,7 @@
 // src/content/tweet-orchestrator.ts
 // 트윗 처리 오케스트레이터: DOM에서 트윗 정보를 추출하고 숨김/표시를 결정.
-import { detectBadgeSvg, parseBadgeInfo } from '@features/badge-detection';
+import { detectBadgeSvg } from '@features/badge-detection';
+import { TIMINGS } from '@shared/constants';
 import { shouldHideTweet, shouldHideRetweet, getQuoteAction, hideTweet, hideQuoteBlock, showTweet } from '@features/content-filter';
 import { matchesKeywordFilter } from '@features/keyword-filter';
 import { extractTweetAuthor, extractRetweeterName, findQuoteBlock, extractQuoteAuthor, extractDisplayName, extractTweetText, formatUserLabel, addDebugLabel, hasBadgeInAuthorArea } from './tweet-processing';
@@ -22,7 +23,7 @@ export function processTweet(tweetEl: HTMLElement): void {
   const author = extractTweetAuthor(tweetEl);
   if (!author) return;
 
-  const { handle, userId } = author;
+  const { handle } = author;
   const currentUserHandle = getCurrentUserHandle();
   const settings = getSettings();
   const whitelistSet = getWhitelistSet();
@@ -30,7 +31,7 @@ export function processTweet(tweetEl: HTMLElement): void {
 
   if (currentUserHandle && handle.toLowerCase() === currentUserHandle.toLowerCase()) return;
 
-  const isFadak = checkFadak(userId, tweetEl);
+  const isFadak = checkFadak(handle.toLowerCase(), tweetEl);
   const displayName = extractDisplayName(tweetEl, handle);
   const userLabel = formatUserLabel(handle, displayName);
 
@@ -54,7 +55,7 @@ export function processTweet(tweetEl: HTMLElement): void {
   }
 
   if (isFadak && !inFollow) {
-    if (processDirectFadak(tweetEl, handle, userId, displayName, settings, whitelistSet, activeFilterRules)) return;
+    if (processDirectFadak(tweetEl, handle, displayName, settings, whitelistSet, activeFilterRules)) return;
   }
 
   processQuote(tweetEl, settings, userLabel);
@@ -86,7 +87,7 @@ function processRetweet(
 
 /** @returns true if tweet was hidden (caller should return early) */
 function processDirectFadak(
-  tweetEl: HTMLElement, handle: string, userId: string, displayName: string | null,
+  tweetEl: HTMLElement, handle: string, displayName: string | null,
   settings: ReturnType<typeof getSettings>, whitelistSet: Set<string>, activeFilterRules: ReturnType<typeof getActiveFilterRules>,
 ): boolean {
   const cachedProfile = profileCache.get(handle.toLowerCase());
@@ -102,7 +103,7 @@ function processDirectFadak(
   }
   const hide = shouldHideTweet({
     settings, followList: new Set<string>(), whitelist: whitelistSet,
-    isFadak: true, userId, handle: `@${handle}`, pageType: getPageType(),
+    isFadak: true, handle: `@${handle}`, pageType: getPageType(),
   });
   if (hide) {
     hideTweet(tweetEl, settings.hideMode, { reason: 'fadak', handle: `@${handle}` });
@@ -152,12 +153,26 @@ export function restoreHiddenTweets(): void {
 export function reprocessExistingTweets(): void {
   const settings = getSettings();
   const feed = document.querySelector('main') ?? document.body;
-  feed.querySelectorAll('article[data-testid="tweet"]').forEach((tweet) => {
-    tweet.querySelector('[data-bbr-debug]')?.remove();
-    try {
-      processTweet(tweet as HTMLElement);
-    } catch (e) {
-      if (settings?.debugMode) console.error('[BBR] processTweet error', e);
+  const tweets = Array.from(feed.querySelectorAll('article[data-testid="tweet"]'));
+  const chunkSize = TIMINGS.REPROCESS_CHUNK_SIZE;
+
+  function processChunk(start: number): void {
+    const end = Math.min(start + chunkSize, tweets.length);
+    for (let i = start; i < end; i++) {
+      const tweet = tweets[i]!;
+      tweet.querySelector('[data-bbr-debug]')?.remove();
+      try {
+        processTweet(tweet as HTMLElement);
+      } catch (e) {
+        if (settings?.debugMode) console.error('[BBR] processTweet error', e);
+      }
     }
-  });
+    if (end < tweets.length) {
+      requestAnimationFrame(() => processChunk(end));
+    }
+  }
+
+  if (tweets.length > 0) {
+    requestAnimationFrame(() => processChunk(0));
+  }
 }

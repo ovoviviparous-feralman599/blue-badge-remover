@@ -37,6 +37,7 @@ export interface StorageSchema {
 
 export interface BadgeInfo {
   userId: string;
+  handle: string | null;
   isBluePremium: boolean;
   isLegacyVerified: boolean;
   isBusiness: boolean;

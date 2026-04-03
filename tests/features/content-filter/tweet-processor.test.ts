@@ -9,7 +9,6 @@ const baseContext = {
   followList: new Set<string>(),
   whitelist: new Set<string>(),
   isFadak: true,
-  userId: '12345',
   handle: '@fadakuser',
   pageType: 'timeline' as const,
 };

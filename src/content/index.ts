@@ -16,6 +16,9 @@ import { listenForMessages } from './message-handler';
 import { listenForSettingsChanges } from './storage-listener';
 
 let feedObserver: FeedObserver;
+let accountSwitchTimerId: ReturnType<typeof setInterval> | null = null;
+let collectorFlushTimerId: ReturnType<typeof setInterval> | null = null;
+let hoverCardObserver: MutationObserver | null = null;
 
 function setDebugFlag(enabled: boolean): void {
   window.postMessage({ type: 'BBR_SET_DEBUG', enabled }, window.location.origin);
@@ -63,8 +66,9 @@ async function detectAndHandleAccountSwitch(): Promise<void> {
 }
 
 function startAccountSwitchWatcher(): void {
+  if (accountSwitchTimerId !== null) clearInterval(accountSwitchTimerId);
   let lastHref = getProfileLinkHref() ?? '';
-  setInterval(() => {
+  accountSwitchTimerId = setInterval(() => {
     const href = getProfileLinkHref() ?? '';
     if (href && href !== lastHref) {
       lastHref = href;
@@ -97,7 +101,8 @@ function handleNavigate(): void {
 }
 
 function observeHoverCards(): void {
-  const observer = new MutationObserver((mutations) => {
+  if (hoverCardObserver) hoverCardObserver.disconnect();
+  hoverCardObserver = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
       for (const node of mutation.addedNodes) {
         if (!(node instanceof HTMLElement)) continue;
@@ -109,7 +114,7 @@ function observeHoverCards(): void {
       }
     }
   });
-  observer.observe(document.body, { childList: true, subtree: true });
+  hoverCardObserver.observe(document.body, { childList: true, subtree: true });
 }
 
 function waitForHoverCardBio(card: HTMLElement): void {
@@ -164,7 +169,8 @@ async function init(): Promise<void> {
   setDebugFlag(settings.debugMode);
   listenForMessages(followCollectorDeps);
   listenForSettingsChanges(setDebugFlag);
-  setInterval(() => { if (getSettings().keywordCollectorEnabled) void flushCollector(); }, TIMINGS.COLLECTOR_FLUSH_INTERVAL);
+  if (collectorFlushTimerId !== null) clearInterval(collectorFlushTimerId);
+  collectorFlushTimerId = setInterval(() => { if (getSettings().keywordCollectorEnabled) void flushCollector(); }, TIMINGS.COLLECTOR_FLUSH_INTERVAL);
 
   window.postMessage({ type: MESSAGE_TYPES.CONTENT_READY }, window.location.origin);
 
