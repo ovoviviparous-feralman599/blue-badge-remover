@@ -1,5 +1,6 @@
 // src/content/index.ts
 // Content script 진입점. 초기화 + 모듈 연결만 담당.
+import { browser } from 'wxt/browser';
 import { FeedObserver, setTweetHiderLanguage } from '@features/content-filter';
 import { getSettings as loadSettings, addToWhitelist } from '@features/settings';
 import { MESSAGE_TYPES, STORAGE_KEYS, TIMINGS } from '@shared/constants';
@@ -46,13 +47,13 @@ async function detectAndHandleAccountSwitch(): Promise<void> {
   const currentHandle = href.slice(1).toLowerCase();
   if (!currentHandle) return;
 
-  const stored = await chrome.storage.local.get([STORAGE_KEYS.CURRENT_USER_ID, STORAGE_KEYS.FOLLOW_CACHE]);
+  const stored = await browser.storage.local.get([STORAGE_KEYS.CURRENT_USER_ID, STORAGE_KEYS.FOLLOW_CACHE]);
   const savedHandle = stored[STORAGE_KEYS.CURRENT_USER_ID] as string | null;
 
   if (savedHandle !== currentHandle) {
     const cache = (stored[STORAGE_KEYS.FOLLOW_CACHE] as Record<string, string[]> | undefined) ?? {};
     const cachedFollows = cache[currentHandle] ?? [];
-    await chrome.storage.local.set({
+    await browser.storage.local.set({
       [STORAGE_KEYS.CURRENT_USER_ID]: currentHandle,
       [STORAGE_KEYS.FOLLOW_LIST]: cachedFollows,
     });
@@ -157,7 +158,7 @@ async function init(): Promise<void> {
   setSettings(settings);
   await loadFilterRules();
 
-  const stored = await chrome.storage.local.get([STORAGE_KEYS.FOLLOW_LIST, STORAGE_KEYS.WHITELIST, STORAGE_KEYS.FOLLOW_CACHE, STORAGE_KEYS.CURRENT_USER_ID]);
+  const stored = await browser.storage.local.get([STORAGE_KEYS.FOLLOW_LIST, STORAGE_KEYS.WHITELIST, STORAGE_KEYS.FOLLOW_CACHE, STORAGE_KEYS.CURRENT_USER_ID]);
   const currentAccount = (stored[STORAGE_KEYS.CURRENT_USER_ID] as string | null) ?? '';
   setCurrentUserHandle(currentAccount || null);
   const cache = (stored[STORAGE_KEYS.FOLLOW_CACHE] as Record<string, string[]> | undefined) ?? {};
@@ -195,7 +196,7 @@ async function init(): Promise<void> {
   }, TIMINGS.INITIAL_SETUP_DELAY);
 
   if (settings.debugMode) {
-    const allStorage = await chrome.storage.local.get(null);
+    const allStorage = await browser.storage.local.get(null);
     console.log('[BBR STORAGE]', JSON.stringify({
       followCount: ((allStorage['followList'] as string[]) ?? []).length,
       whitelistCount: ((allStorage['whitelist'] as string[]) ?? []).length,

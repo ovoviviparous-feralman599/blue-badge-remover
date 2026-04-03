@@ -1,3 +1,4 @@
+import { browser } from 'wxt/browser';
 import {
   DEFAULT_FILTER_LIST,
   getCustomFilterList,
@@ -22,7 +23,7 @@ async function init(): Promise<void> {
   const [customText, settings, stored] = await Promise.all([
     getCustomFilterList(),
     getSettings(),
-    chrome.storage.local.get([STORAGE_KEYS.DISABLED_FILTER_CATEGORIES]),
+    browser.storage.local.get([STORAGE_KEYS.DISABLED_FILTER_CATEGORIES]),
   ]);
 
   const disabledCategories: string[] =
@@ -136,7 +137,7 @@ async function handleCategoryToggle(
     card.classList.add('is-disabled');
   }
 
-  await chrome.storage.local.set({
+  await browser.storage.local.set({
     [STORAGE_KEYS.DISABLED_FILTER_CATEGORIES]: [...disabledCategories],
   });
 

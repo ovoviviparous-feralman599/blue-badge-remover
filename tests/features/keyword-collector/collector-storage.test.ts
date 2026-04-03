@@ -1,24 +1,27 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getCollectedFadaks, saveCollectedFadaks, clearCollectedFadaks } from '@features/keyword-collector/collector-storage';
 import type { CollectedFadak } from '@shared/types';
 
 const mockStorage: Record<string, unknown> = {};
 
-vi.stubGlobal('chrome', {
-  storage: {
-    local: {
-      get: vi.fn((keys: string[]) =>
-        Promise.resolve(
-          Object.fromEntries(keys.filter((k) => k in mockStorage).map((k) => [k, mockStorage[k]])),
+vi.mock('wxt/browser', () => ({
+  browser: {
+    storage: {
+      local: {
+        get: vi.fn((keys: string[]) =>
+          Promise.resolve(
+            Object.fromEntries(keys.filter((k: string) => k in mockStorage).map((k: string) => [k, mockStorage[k]])),
+          ),
         ),
-      ),
-      set: vi.fn((items: Record<string, unknown>) => {
-        Object.assign(mockStorage, items);
-        return Promise.resolve();
-      }),
+        set: vi.fn((items: Record<string, unknown>) => {
+          Object.assign(mockStorage, items);
+          return Promise.resolve();
+        }),
+      },
     },
   },
-});
+}));
+
+const { getCollectedFadaks, saveCollectedFadaks, clearCollectedFadaks } = await import('@features/keyword-collector/collector-storage');
 
 const sample: CollectedFadak = {
   userId: 'u1',

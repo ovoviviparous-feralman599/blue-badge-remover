@@ -26,6 +26,14 @@ export default defineConfig({
         matches: ['https://x.com/*', 'https://twitter.com/*'],
       },
     ],
+    browser_specific_settings: {
+      gecko: {
+        id: 'blue-badge-remover@fotone',
+        data_collection_permissions: {
+          required: ['none'],
+        },
+      },
+    },
   },
   vite: () => ({
     resolve: {

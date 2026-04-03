@@ -1,3 +1,4 @@
+import { browser } from 'wxt/browser';
 import { getSettings, getWhitelist, addToWhitelist, removeFromWhitelist } from '@features/settings';
 import { t } from '@shared/i18n';
 import type { Language } from '@shared/i18n';
@@ -83,6 +84,6 @@ async function init(): Promise<void> {
   await refresh();
 }
 
-if (typeof chrome !== 'undefined' && chrome.storage) {
+if (browser?.storage) {
   void init();
 }

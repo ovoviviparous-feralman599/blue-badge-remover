@@ -1,5 +1,6 @@
 // src/content/storage-listener.ts
-// chrome.storage.onChanged 리스너: 설정/팔로우/화이트리스트/필터 변경 시 반응.
+// browser.storage.onChanged 리스너: 설정/팔로우/화이트리스트/필터 변경 시 반응.
+import { browser } from 'wxt/browser';
 import { setTweetHiderLanguage } from '@features/content-filter';
 import { STORAGE_KEYS } from '@shared/constants';
 import type { Settings } from '@shared/types';
@@ -9,7 +10,7 @@ import { loadFilterRules, flushCollector } from './collector-buffer';
 import { removeFadakBanner } from './fadak-banner';
 
 export function listenForSettingsChanges(setDebugFlag: (enabled: boolean) => void): void {
-  chrome.storage.onChanged.addListener((changes) => {
+  browser.storage.onChanged.addListener((changes) => {
     const settingsChange = changes[STORAGE_KEYS.SETTINGS];
     if (settingsChange) {
       handleSettingsChange(settingsChange.newValue as Settings, setDebugFlag);
