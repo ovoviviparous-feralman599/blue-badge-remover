@@ -19,6 +19,6 @@
       "@features/*": ["./src/features/*"]
     }
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts"],
+  "include": ["src/**/*.ts", "tests/**/*.ts", "entrypoints/**/*.ts", ".wxt/wxt.d.ts"],
   "exclude": ["node_modules", "dist"]
 }
