@@ -1,24 +1,28 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getSettings, saveSettings, getWhitelist, addToWhitelist, removeFromWhitelist } from '@features/settings/storage';
 import { DEFAULT_SETTINGS } from '@shared/constants';
 
 const mockStorage: Record<string, unknown> = {};
 
-vi.stubGlobal('chrome', {
-  storage: {
-    local: {
-      get: vi.fn((keys: string[]) =>
-        Promise.resolve(
-          Object.fromEntries(keys.filter((k) => k in mockStorage).map((k) => [k, mockStorage[k]])),
+vi.mock('wxt/browser', () => ({
+  browser: {
+    storage: {
+      local: {
+        get: vi.fn((keys: string[]) =>
+          Promise.resolve(
+            Object.fromEntries(keys.filter((k: string) => k in mockStorage).map((k: string) => [k, mockStorage[k]])),
+          ),
         ),
-      ),
-      set: vi.fn((items: Record<string, unknown>) => {
-        Object.assign(mockStorage, items);
-        return Promise.resolve();
-      }),
+        set: vi.fn((items: Record<string, unknown>) => {
+          Object.assign(mockStorage, items);
+          return Promise.resolve();
+        }),
+      },
     },
   },
-});
+}));
+
+// Dynamic import after mock is set up
+const { getSettings, saveSettings, getWhitelist, addToWhitelist, removeFromWhitelist } = await import('@features/settings/storage');
 
 beforeEach(() => {
   Object.keys(mockStorage).forEach((k) => delete mockStorage[k]);

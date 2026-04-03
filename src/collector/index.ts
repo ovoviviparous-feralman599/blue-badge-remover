@@ -1,5 +1,6 @@
 // src/collector/index.ts
 // 키워드 수집기 페이지 진입점
+import { browser } from 'wxt/browser';
 import { getCollectedFadaks } from '@features/keyword-collector';
 import { getCustomFilterList, parseFilterList, DEFAULT_FILTER_LIST } from '@features/keyword-filter';
 import type { CollectedFadak, FilterRule } from '@shared/types';
@@ -23,7 +24,7 @@ async function init(): Promise<void> {
   renderList(list);
   bindExportEvents();
 
-  chrome.storage.onChanged.addListener((changes) => {
+  browser.storage.onChanged.addListener((changes) => {
     if (changes['collectedFadaks']) {
       const updated = (changes['collectedFadaks'].newValue as CollectedFadak[] | undefined) ?? [];
       cachedList = updated;

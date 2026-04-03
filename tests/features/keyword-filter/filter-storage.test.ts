@@ -1,25 +1,28 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getCustomFilterList, saveCustomFilterList } from '@features/keyword-filter/filter-storage';
 
 const mockStorage: Record<string, unknown> = {};
 
-vi.stubGlobal('chrome', {
-  storage: {
-    local: {
-      get: vi.fn((keys: string[]) =>
-        Promise.resolve(
-          Object.fromEntries(
-            keys.filter((k) => k in mockStorage).map((k) => [k, mockStorage[k]]),
+vi.mock('wxt/browser', () => ({
+  browser: {
+    storage: {
+      local: {
+        get: vi.fn((keys: string[]) =>
+          Promise.resolve(
+            Object.fromEntries(
+              keys.filter((k: string) => k in mockStorage).map((k: string) => [k, mockStorage[k]]),
+            ),
           ),
         ),
-      ),
-      set: vi.fn((items: Record<string, unknown>) => {
-        Object.assign(mockStorage, items);
-        return Promise.resolve();
-      }),
+        set: vi.fn((items: Record<string, unknown>) => {
+          Object.assign(mockStorage, items);
+          return Promise.resolve();
+        }),
+      },
     },
   },
-});
+}));
+
+const { getCustomFilterList, saveCustomFilterList } = await import('@features/keyword-filter/filter-storage');
 
 beforeEach(() => {
   Object.keys(mockStorage).forEach((k) => delete mockStorage[k]);

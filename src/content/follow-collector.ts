@@ -1,4 +1,5 @@
 // src/content/follow-collector.ts
+import { browser } from 'wxt/browser';
 import { STORAGE_KEYS, TIMINGS } from '@shared/constants';
 import type { Settings } from '@shared/types';
 import { logger } from '@shared/utils/logger';
@@ -26,7 +27,7 @@ export async function saveFollowHandles(
   deps: FollowCollectorDeps,
 ): Promise<void> {
   if (!handles.length) return;
-  const stored = await chrome.storage.local.get([STORAGE_KEYS.FOLLOW_CACHE, STORAGE_KEYS.CURRENT_USER_ID]);
+  const stored = await browser.storage.local.get([STORAGE_KEYS.FOLLOW_CACHE, STORAGE_KEYS.CURRENT_USER_ID]);
   const currentAccount = (stored[STORAGE_KEYS.CURRENT_USER_ID] as string | null) ?? '';
   const cache = (stored[STORAGE_KEYS.FOLLOW_CACHE] as Record<string, string[]> | undefined) ?? {};
   const existing = currentAccount ? (cache[currentAccount] ?? []) : [];
@@ -34,7 +35,7 @@ export async function saveFollowHandles(
   if (currentAccount) {
     cache[currentAccount] = merged;
   }
-  await chrome.storage.local.set({
+  await browser.storage.local.set({
     [STORAGE_KEYS.FOLLOW_CACHE]: cache,
     [STORAGE_KEYS.FOLLOW_LIST]: merged,
     [STORAGE_KEYS.LAST_SYNC_AT]: new Date().toISOString(),
@@ -49,7 +50,7 @@ export async function removeFollowHandle(
   deps: FollowCollectorDeps,
 ): Promise<void> {
   const lower = handle.toLowerCase();
-  const stored = await chrome.storage.local.get([STORAGE_KEYS.FOLLOW_CACHE, STORAGE_KEYS.CURRENT_USER_ID]);
+  const stored = await browser.storage.local.get([STORAGE_KEYS.FOLLOW_CACHE, STORAGE_KEYS.CURRENT_USER_ID]);
   const currentAccount = (stored[STORAGE_KEYS.CURRENT_USER_ID] as string | null) ?? '';
   const cache = (stored[STORAGE_KEYS.FOLLOW_CACHE] as Record<string, string[]> | undefined) ?? {};
   const existing = currentAccount ? (cache[currentAccount] ?? []) : [];
@@ -57,7 +58,7 @@ export async function removeFollowHandle(
   if (currentAccount) {
     cache[currentAccount] = filtered;
   }
-  await chrome.storage.local.set({
+  await browser.storage.local.set({
     [STORAGE_KEYS.FOLLOW_CACHE]: cache,
     [STORAGE_KEYS.FOLLOW_LIST]: filtered,
   });

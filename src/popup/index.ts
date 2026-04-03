@@ -1,3 +1,4 @@
+import { browser } from 'wxt/browser';
 import { getSettings, saveSettings } from '@features/settings';
 import { STORAGE_KEYS } from '@shared/constants';
 import { t, type Language } from '@shared/i18n';
@@ -13,7 +14,7 @@ function openPage(url: string): void {
   if (isFirefoxAndroid()) {
     window.location.href = url;
   } else {
-    void chrome.tabs.create({ url });
+    void browser.tabs.create({ url });
   }
 }
 
@@ -75,7 +76,7 @@ function renderSettings(): void {
 
 async function renderSyncStatus(): Promise<void> {
   const lang = settings.language;
-  const stored = await chrome.storage.local.get([STORAGE_KEYS.LAST_SYNC_AT, STORAGE_KEYS.FOLLOW_LIST, STORAGE_KEYS.CURRENT_USER_ID]);
+  const stored = await browser.storage.local.get([STORAGE_KEYS.LAST_SYNC_AT, STORAGE_KEYS.FOLLOW_LIST, STORAGE_KEYS.CURRENT_USER_ID]);
   const lastSync = stored[STORAGE_KEYS.LAST_SYNC_AT] as string | null;
   const followList = (stored[STORAGE_KEYS.FOLLOW_LIST] as string[] | undefined) ?? [];
   const currentAccount = stored[STORAGE_KEYS.CURRENT_USER_ID] as string | null;
@@ -100,7 +101,7 @@ async function renderOnboarding(): Promise<void> {
   const banner = document.getElementById('onboarding-banner');
   if (!banner) return;
   try {
-    const result = await chrome.storage.local.get([
+    const result = await browser.storage.local.get([
       STORAGE_KEYS.FOLLOW_LIST,
       STORAGE_KEYS.LAST_SYNC_AT,
       'onboardingDismissed',
@@ -155,16 +156,16 @@ function bindEvents(): void {
   });
 
   document.getElementById('open-whitelist-btn')!.addEventListener('click', () => {
-    openPage(chrome.runtime.getURL('/whitelist.html'));
+    openPage(browser.runtime.getURL('/whitelist.html'));
   });
 
   document.getElementById('clear-cache-btn')!.addEventListener('click', async () => {
-    const stored = await chrome.storage.local.get([STORAGE_KEYS.CURRENT_USER_ID, STORAGE_KEYS.FOLLOW_CACHE]);
+    const stored = await browser.storage.local.get([STORAGE_KEYS.CURRENT_USER_ID, STORAGE_KEYS.FOLLOW_CACHE]);
     const currentAccount = stored[STORAGE_KEYS.CURRENT_USER_ID] as string | null;
     if (!currentAccount) return;
     const cache = (stored[STORAGE_KEYS.FOLLOW_CACHE] as Record<string, string[]> | undefined) ?? {};
     delete cache[currentAccount];
-    await chrome.storage.local.set({
+    await browser.storage.local.set({
       [STORAGE_KEYS.FOLLOW_CACHE]: cache,
       [STORAGE_KEYS.FOLLOW_LIST]: [],
       [STORAGE_KEYS.LAST_SYNC_AT]: null,
@@ -185,15 +186,15 @@ function bindEvents(): void {
   });
 
   document.getElementById('open-options-btn')!.addEventListener('click', () => {
-    openPage(chrome.runtime.getURL('/options.html'));
+    openPage(browser.runtime.getURL('/options.html'));
   });
 
   document.getElementById('open-collector-btn')!.addEventListener('click', () => {
-    openPage(chrome.runtime.getURL('/collector.html'));
+    openPage(browser.runtime.getURL('/collector.html'));
   });
 
   document.getElementById('onboarding-dismiss')?.addEventListener('click', async () => {
-    await chrome.storage.local.set({ onboardingDismissed: true });
+    await browser.storage.local.set({ onboardingDismissed: true });
     const banner = document.getElementById('onboarding-banner');
     if (banner) banner.style.display = 'none';
   });
@@ -202,7 +203,7 @@ function bindEvents(): void {
     openPage('https://x.com/following');
   });
 
-  chrome.storage.onChanged.addListener((changes) => {
+  browser.storage.onChanged.addListener((changes) => {
     if (changes[STORAGE_KEYS.LAST_SYNC_AT]) {
       const banner = document.getElementById('onboarding-banner');
       if (banner) banner.style.display = 'none';

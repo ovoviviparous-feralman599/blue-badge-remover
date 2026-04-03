@@ -1,28 +1,31 @@
 // tests/content/follow-collector.test.ts
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { collectFollowsFromDOM, getMyHandle } from '../../src/content/follow-collector';
-import type { FollowCollectorDeps } from '../../src/content/follow-collector';
 
-// Mock chrome.storage.local
+// Mock browser.storage.local
 const mockChromeStorage: Record<string, unknown> = {};
-vi.stubGlobal('chrome', {
-  storage: {
-    local: {
-      get: vi.fn(async (keys: string[]) => {
-        const result: Record<string, unknown> = {};
-        for (const key of keys) {
-          if (key in mockChromeStorage) {
-            result[key] = mockChromeStorage[key];
+vi.mock('wxt/browser', () => ({
+  browser: {
+    storage: {
+      local: {
+        get: vi.fn(async (keys: string[]) => {
+          const result: Record<string, unknown> = {};
+          for (const key of keys) {
+            if (key in mockChromeStorage) {
+              result[key] = mockChromeStorage[key];
+            }
           }
-        }
-        return result;
-      }),
-      set: vi.fn(async (data: Record<string, unknown>) => {
-        Object.assign(mockChromeStorage, data);
-      }),
+          return result;
+        }),
+        set: vi.fn(async (data: Record<string, unknown>) => {
+          Object.assign(mockChromeStorage, data);
+        }),
+      },
     },
   },
-});
+}));
+
+const { collectFollowsFromDOM, getMyHandle } = await import('../../src/content/follow-collector');
+type FollowCollectorDeps = import('../../src/content/follow-collector').FollowCollectorDeps;
 
 function setPath(path: string): void {
   Object.defineProperty(window, 'location', {

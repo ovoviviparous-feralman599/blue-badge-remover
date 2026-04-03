@@ -1,3 +1,4 @@
+import { browser } from 'wxt/browser';
 import { MESSAGE_TYPES } from '@shared/constants';
 
 const INJECTED_ATTR = 'data-bbr-settings-btn';
@@ -18,14 +19,14 @@ export function injectSettingsShortcut(): void {
 
   link.innerHTML = '';
   const img = document.createElement('img');
-  img.src = chrome.runtime.getURL('icons/icon48.png');
+  img.src = browser.runtime.getURL('icons/icon48.png');
   img.alt = 'BBR';
   img.style.cssText = 'width:26px;height:26px;border-radius:50%;';
   link.appendChild(img);
 
   link.addEventListener('click', (e) => {
     e.preventDefault();
-    void chrome.runtime.sendMessage({ type: MESSAGE_TYPES.OPEN_SETTINGS });
+    void browser.runtime.sendMessage({ type: MESSAGE_TYPES.OPEN_SETTINGS });
   });
 }
 

@@ -1,4 +1,5 @@
 // entrypoints/background.ts — WXT background service worker
+import { browser } from 'wxt/browser';
 import { logger } from '@shared/utils/logger';
 import { MESSAGE_TYPES } from '@shared/constants';
 
@@ -7,17 +8,17 @@ export default defineBackground(() => {
 
   const isFirefoxAndroid = navigator.userAgent.includes('Firefox') && navigator.userAgent.includes('Android');
 
-  // MV2/MV3 호환: chrome.action (MV3) 또는 chrome.browserAction (MV2)
-  const actionApi = chrome.action ?? (chrome as unknown as Record<string, unknown>).browserAction as typeof chrome.action | undefined;
+  // MV2/MV3 호환: browser.action (MV3) 또는 browser.browserAction (MV2)
+  const actionApi = browser.action ?? (browser as unknown as Record<string, unknown>).browserAction as typeof browser.action | undefined;
 
   // content script → 설정 페이지 열기 요청 처리
-  chrome.runtime.onMessage.addListener((message, sender) => {
-    if (message.type !== MESSAGE_TYPES.OPEN_SETTINGS) return;
-    const settingsUrl = chrome.runtime.getURL('/popup.html');
+  browser.runtime.onMessage.addListener((message, sender) => {
+    if ((message as Record<string, unknown>).type !== MESSAGE_TYPES.OPEN_SETTINGS) return;
+    const settingsUrl = browser.runtime.getURL('/popup.html');
     if (isFirefoxAndroid && sender.tab?.id != null) {
-      void chrome.tabs.update(sender.tab.id, { url: settingsUrl });
+      void browser.tabs.update(sender.tab.id, { url: settingsUrl });
     } else {
-      void chrome.tabs.create({ url: settingsUrl });
+      void browser.tabs.create({ url: settingsUrl });
     }
   });
 
@@ -26,7 +27,7 @@ export default defineBackground(() => {
   if (isFirefoxAndroid && actionApi) {
     actionApi.setPopup({ popup: '' });
     actionApi.onClicked.addListener(() => {
-      chrome.tabs.create({ url: chrome.runtime.getURL('/popup.html') });
+      void browser.tabs.create({ url: browser.runtime.getURL('/popup.html') });
     });
   }
 });
