@@ -148,11 +148,7 @@ function bindEvents(): void {
   });
 
   document.getElementById('sync-btn')!.addEventListener('click', async () => {
-    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-    const currentTab = tabs[0];
-    if (currentTab?.id) {
-      await chrome.tabs.create({ url: 'https://x.com/following', active: true });
-    }
+    openPage('https://x.com/following');
     const btn = document.getElementById('sync-btn') as HTMLButtonElement;
     btn.textContent = t('scrollOnFollowingPage', settings.language);
     setTimeout(() => { btn.textContent = t('openFollowingPage', settings.language); }, 3000);
@@ -189,11 +185,7 @@ function bindEvents(): void {
   });
 
   document.getElementById('open-options-btn')!.addEventListener('click', () => {
-    if (isFirefoxAndroid()) {
-      window.location.href = chrome.runtime.getURL('/options.html');
-    } else {
-      chrome.runtime.openOptionsPage();
-    }
+    openPage(chrome.runtime.getURL('/options.html'));
   });
 
   document.getElementById('open-collector-btn')!.addEventListener('click', () => {
@@ -206,8 +198,8 @@ function bindEvents(): void {
     if (banner) banner.style.display = 'none';
   });
 
-  document.getElementById('onboarding-cta')?.addEventListener('click', async () => {
-    await chrome.tabs.create({ url: 'https://x.com/following', active: true });
+  document.getElementById('onboarding-cta')?.addEventListener('click', () => {
+    openPage('https://x.com/following');
   });
 
   chrome.storage.onChanged.addListener((changes) => {
