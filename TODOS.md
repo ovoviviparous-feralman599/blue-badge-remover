@@ -43,4 +43,6 @@
 
 ### 모바일 QA
 - [ ] Firefox Android 실기기 수동 QA (설정 저장, 팔로우 동기화, 필터링 동작)
+
+### 모바일 E2E PoC
 - Firefox Android 자동 테스트 접근법 조사 (Appium 등)
