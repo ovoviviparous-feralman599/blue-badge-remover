@@ -11,10 +11,10 @@
 ## 수동 작업 필요
 
 ### 스토어 API 키 발급
-- [ ] Chrome Web Store: Google Cloud Console → OAuth → client ID/secret/refresh token
-- [ ] Firefox AMO: addons.mozilla.org → 개발자 허브 → API 키 (JWT issuer/secret)
+- [x] Chrome Web Store: 완료
+- [x] Firefox AMO: 완료
 - [ ] Edge Add-ons: Microsoft Partner Center → API 키
-- [ ] GitHub Secrets에 등록 후 release.yml의 자동 제출 활성화
+- [ ] GitHub Secrets에 Edge 키 등록 후 release.yml의 자동 제출 활성화
 
 ### 웹스토어 페이지 개선
 - [ ] 영문 설명 작성/개선
@@ -41,6 +41,6 @@
 
 ## 향후
 
-### 모바일 E2E PoC
-- Firefox Android 자동 테스트 접근법 조사
-- Appium 또는 실기기 기반 테스트 가능성 검토
+### 모바일 QA
+- [ ] Firefox Android 실기기 수동 QA (설정 저장, 팔로우 동기화, 필터링 동작)
+- Firefox Android 자동 테스트 접근법 조사 (Appium 등)
