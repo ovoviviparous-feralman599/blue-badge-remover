@@ -56,6 +56,7 @@ export async function flushCollector(): Promise<void> {
     }
   }
   await saveCollectedFadaks(Array.from(merged.values()));
+  collectorBuffer.clear();
 }
 
 export async function loadFilterRules(): Promise<void> {

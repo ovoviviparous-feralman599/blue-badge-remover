@@ -19,7 +19,8 @@ const X_GRAPHQL_ENDPOINTS = [
 let bbrDebugMode = false;
 
 // Cache profiles from API responses so they can be replayed after content script is ready
-const cachedProfiles: ProfileEntry[] = [];
+const MAX_CACHED_PROFILES = 10000;
+const cachedProfiles = new Map<string, ProfileEntry>();
 
 window.addEventListener('message', (event) => {
   if (event.source !== window) return;
@@ -28,8 +29,8 @@ window.addEventListener('message', (event) => {
     bbrDebugMode = !!(data.enabled);
   }
   // Content script signals it's ready — replay cached profiles so none are missed
-  if (data?.type === MESSAGE_TYPES.CONTENT_READY && cachedProfiles.length > 0) {
-    window.postMessage({ type: MESSAGE_TYPES.PROFILE_DATA, profiles: [...cachedProfiles] }, '*');
+  if (data?.type === MESSAGE_TYPES.CONTENT_READY && cachedProfiles.size > 0) {
+    window.postMessage({ type: MESSAGE_TYPES.PROFILE_DATA, profiles: Array.from(cachedProfiles.values()) }, '*');
   }
 });
 
@@ -142,8 +143,12 @@ function extractBadgeData(data: unknown, endpointHint?: string): void {
 
     if (profiles.length > 0) {
       for (const p of profiles) {
-        if (!cachedProfiles.some((c) => c.userId === p.userId)) {
-          cachedProfiles.push(p);
+        if (!cachedProfiles.has(p.userId)) {
+          if (cachedProfiles.size >= MAX_CACHED_PROFILES) {
+            const firstKey = cachedProfiles.keys().next().value;
+            if (firstKey !== undefined) cachedProfiles.delete(firstKey);
+          }
+          cachedProfiles.set(p.userId, p);
         }
       }
       window.postMessage({ type: MESSAGE_TYPES.PROFILE_DATA, profiles }, '*');

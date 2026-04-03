@@ -6,15 +6,48 @@ describe('parseBadgeInfo', () => {
     const userData = {
       rest_id: '12345',
       is_blue_verified: true,
-      legacy: { verified: false },
+      legacy: { verified: false, screen_name: 'testuser' },
     };
     const result = parseBadgeInfo(userData);
     expect(result).toEqual({
       userId: '12345',
+      handle: 'testuser',
       isBluePremium: true,
       isLegacyVerified: false,
       isBusiness: false,
     });
+  });
+
+  it('should return handle from legacy.screen_name', () => {
+    const userData = {
+      rest_id: '12345',
+      is_blue_verified: true,
+      legacy: { verified: false, screen_name: 'from_legacy' },
+      core: { screen_name: 'from_core' },
+    };
+    const result = parseBadgeInfo(userData);
+    expect(result?.handle).toBe('from_legacy');
+  });
+
+  it('should fallback to core.screen_name when legacy has no screen_name', () => {
+    const userData = {
+      rest_id: '12345',
+      is_blue_verified: true,
+      legacy: { verified: false },
+      core: { screen_name: 'from_core' },
+    };
+    const result = parseBadgeInfo(userData);
+    expect(result?.handle).toBe('from_core');
+  });
+
+  it('should return null handle when no screen_name available', () => {
+    const userData = {
+      rest_id: '12345',
+      is_blue_verified: true,
+      legacy: { verified: false },
+    };
+    const result = parseBadgeInfo(userData);
+    expect(result?.handle).toBeNull();
   });
 
   it('should detect legacy verified account', () => {

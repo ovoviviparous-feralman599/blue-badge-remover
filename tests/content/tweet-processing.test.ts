@@ -34,7 +34,7 @@ describe('extractTweetAuthor', () => {
       </article>
     `);
     const result = extractTweetAuthor(el);
-    expect(result).toEqual({ handle: 'test_user', userId: 'test_user' });
+    expect(result).toEqual({ handle: 'test_user' });
   });
 
   it('리트윗 표시 링크는 건너뜀', () => {

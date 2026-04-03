@@ -1,7 +1,7 @@
 // src/content/tweet-processing.ts
 // DOM-level tweet parsing utilities used by processTweet in content/index.ts
 
-export function extractTweetAuthor(tweetEl: HTMLElement): { handle: string; userId: string } | null {
+export function extractTweetAuthor(tweetEl: HTMLElement): { handle: string } | null {
   const allLinks = tweetEl.querySelectorAll('a[role="link"][href^="/"]');
   for (const link of allLinks) {
     const text = link.textContent ?? '';
@@ -10,7 +10,7 @@ export function extractTweetAuthor(tweetEl: HTMLElement): { handle: string; user
     if (!href) continue;
     const handle = href.slice(1).split('/')[0];
     if (!handle || handle === 'i' || handle === 'hashtag' || href.includes('/status/') || href.includes('/photo/')) continue;
-    return { handle, userId: handle };
+    return { handle };
   }
   return null;
 }
@@ -27,20 +27,23 @@ export function extractRetweeterName(tweetEl: HTMLElement): string | null {
 }
 
 export function findQuoteBlock(tweetEl: HTMLElement): HTMLElement | null {
-  const allNodes = tweetEl.querySelectorAll('div, span');
-  for (const node of allNodes) {
-    if (node.childNodes.length === 1 && node.textContent?.trim() === '인용') {
-      const next = node.nextElementSibling as HTMLElement | null;
+  const ownerDoc = tweetEl.ownerDocument;
+  const walker = ownerDoc.createTreeWalker(tweetEl, NodeFilter.SHOW_ELEMENT);
+  let enFallback: HTMLElement | null = null;
+  let node: Node | null;
+  while ((node = walker.nextNode())) {
+    const el = node as HTMLElement;
+    if ((el.tagName !== 'DIV' && el.tagName !== 'SPAN') || el.childNodes.length !== 1) continue;
+    const text = el.textContent?.trim();
+    if (text === '인용') {
+      const next = el.nextElementSibling as HTMLElement | null;
       if (next) return next;
     }
-  }
-  for (const node of allNodes) {
-    if (node.childNodes.length === 1 && node.textContent?.trim() === 'Quote') {
-      const next = node.nextElementSibling as HTMLElement | null;
-      if (next) return next;
+    if (text === 'Quote' && !enFallback) {
+      enFallback = el.nextElementSibling as HTMLElement | null;
     }
   }
-  return null;
+  return enFallback;
 }
 
 export interface QuoteAuthorInfo {
