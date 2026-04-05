@@ -14,7 +14,6 @@ export default defineConfig({
       'https://api.x.com/*',
       'https://twitter.com/*',
       'https://api.twitter.com/*',
-      'https://raw.githubusercontent.com/fotoner/blue-badge-remover/*',
     ],
     icons: {
       16: 'icons/icon16.png',

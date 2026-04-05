@@ -2,7 +2,6 @@
 import { browser } from 'wxt/browser';
 import { logger } from '@shared/utils/logger';
 import { MESSAGE_TYPES } from '@shared/constants';
-import { shouldUpdate, updateAllPacks } from '@features/filter-pack';
 import { cleanupOldStats } from '@features/stats';
 
 const UPDATE_NOTI_FLAG = 'bbr-update-available';
@@ -24,10 +23,7 @@ export default defineBackground(() => {
     }
   });
 
-  // SW 시작 시 팩 업데이트 체크 + 통계 정리 (alarms 불필요)
-  void shouldUpdate().then((needed) => {
-    if (needed) void updateAllPacks();
-  });
+  // SW 시작 시 통계 정리
   void cleanupOldStats();
 
   // content script → 설정 페이지 열기 요청 처리
