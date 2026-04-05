@@ -24,8 +24,6 @@ entrypoints/  (WXT 진입점)
 ├── whitelist/            화이트리스트 관리
 └── collector/            키워드 수집기
 
-packs/                    기본 제공 필터 팩 (JSON)
-
 src/
 ├── content/              Content Script 로직 (8개 모듈)
 │   ├── index.ts              초기화 + 모듈 연결

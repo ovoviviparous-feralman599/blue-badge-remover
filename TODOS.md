@@ -74,7 +74,13 @@
 - `account-list.ts`에서 `fadak.handle`에 `escapeHtml()` 적용
 
 ### ~~host_permissions 범위 축소~~
-- `wxt.config.ts`의 `raw.githubusercontent.com/*` → `fotoner/blue-badge-remover/*`로 스코핑
+- `raw.githubusercontent.com` host_permission 완전 제거 (팩 자동 업데이트 제거)
+
+### ~~alarms 권한 제거~~
+- SW 시작 시 timestamp 체크 방식으로 대체
+
+### ~~기본 필터 팩 제거~~
+- 번들 팩 삭제, 사용자 가져오기/내보내기로 관리
 
 ## 향후
 
