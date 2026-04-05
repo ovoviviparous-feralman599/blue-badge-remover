@@ -91,7 +91,7 @@ jobs:
       # Store submission (테스트 릴리스는 스토어 제출 건너뜀)
       - name: Submit to Chrome Web Store
         if: env.CHROME_EXTENSION_ID != '' && !contains(github.ref_name, '-test')
-        continue-on-error: true
+        continue-on-error: false
         run: npx wxt submit --chrome-zip "blue-badge-remover-chrome-${TAG_NAME}.zip"
         env:
           CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
@@ -101,7 +101,7 @@ jobs:
 
       - name: Submit to Firefox AMO
         if: env.FIREFOX_JWT_ISSUER != '' && !contains(github.ref_name, '-test')
-        continue-on-error: true
+        continue-on-error: false
         run: npx wxt submit --firefox-zip "blue-badge-remover-firefox-${TAG_NAME}.zip"
         env:
           FIREFOX_EXTENSION_ID: ${{ secrets.FIREFOX_EXTENSION_ID }}
@@ -110,7 +110,7 @@ jobs:
 
       - name: Submit to Edge Add-ons
         if: env.EDGE_PRODUCT_ID != '' && !contains(github.ref_name, '-test')
-        continue-on-error: true
+        continue-on-error: false
         run: npx wxt submit --edge-zip "blue-badge-remover-edge-${TAG_NAME}.zip"
         env:
           EDGE_PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
