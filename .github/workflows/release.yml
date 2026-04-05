@@ -35,7 +35,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run build
       - name: Run E2E tests
-        run: npx playwright test
+        run: xvfb-run npx playwright test
         continue-on-error: ${{ contains(github.ref_name, '-test') }}
 
   build-and-release:
