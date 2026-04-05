@@ -6,8 +6,41 @@ on:
       - 'v*'
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm test
+      - run: npx tsc --noEmit
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Run E2E tests
+        run: npx playwright test
+        continue-on-error: ${{ contains(github.ref_name, '-test') }}
+
+  build-and-release:
+    runs-on: ubuntu-latest
+    needs: [test, e2e]
     permissions:
       contents: write
     env:
@@ -22,8 +55,6 @@ jobs:
           cache: npm
 
       - run: npm ci
-
-      - run: npm test
 
       # Chrome
       - name: Build Chrome
@@ -57,7 +88,7 @@ jobs:
           generate_release_notes: true
           prerelease: ${{ contains(github.ref_name, '-test') }}
 
-      # Store submission (테스트 릴리스(-test 접미사)는 스토어 제출 건너뜀)
+      # Store submission (테스트 릴리스는 스토어 제출 건너뜀)
       - name: Submit to Chrome Web Store
         if: env.CHROME_EXTENSION_ID != '' && !contains(github.ref_name, '-test')
         continue-on-error: true

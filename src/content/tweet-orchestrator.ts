@@ -95,7 +95,10 @@ export function processTweet(tweetEl: HTMLElement): void {
     });
     recordHide(tweetEl, result.category, result.packId);
   }
-  // action === 'skip' → 비파딱, 아무것도 안 함
+  // action === 'skip' → 비파딱. SVG 부분 렌더링으로 오감지 후 숨겨졌을 수 있음 → 복원
+  if (result.action === 'skip' && tweetEl.hasAttribute('data-bbr-original')) {
+    showTweet(tweetEl);
+  }
 
   // 인용 트윗 처리 (전역 필터링 OFF면 스킵)
   if (settings.enabled) {
